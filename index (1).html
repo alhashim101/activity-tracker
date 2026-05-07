@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="متتبع الأنشطة">
+<meta name="theme-color" content="#0D4F4F">
+<title>متتبع الأنشطة اليومية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0D4F4F;
+  --primary-mid: #0D9488;
+  --primary-light: #14B8A6;
+  --primary-surface: #F0FDFA;
+  --primary-glow: rgba(13,148,136,0.12);
+  --green: #059669;
+  --green-light: #D1FAE5;
+  --amber: #D97706;
+  --amber-light: #FEF3C7;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --bg: #F4F7FA;
+  --surface: #FFFFFF;
+  --text-primary: #0F1729;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-xl: 0 20px 48px rgba(0,0,0,0.14);
+  --tr-fast: 150ms cubic-bezier(0.4,0,0.2,1);
+  --tr-base: 250ms cubic-bezier(0.4,0,0.2,1);
+  --tr-slow: 350ms cubic-bezier(0.4,0,0.2,1);
+  --font-display: 'Tajawal', sans-serif;
+  --font-body: 'Readex Pro', sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);min-height:100vh;direction:rtl;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.app{max-width:960px;margin:0 auto;padding:24px 16px 80px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:inline-block;vertical-align:middle}
+.icon-sm{width:16px;height:16px}.icon-lg{width:24px;height:24px}
+
+/* Toast */
+.toast{position:fixed;top:24px;left:50%;z-index:9999;transform:translateX(-50%) translateY(-120px);background:var(--primary);color:#fff;padding:12px 28px;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);transition:transform var(--tr-slow);pointer-events:none;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Sync indicator */
+.sync-bar{background:var(--amber-light);color:var(--amber);padding:10px 20px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;font-weight:600;display:none;align-items:center;gap:8px;border:1.5px solid var(--amber)}
+.sync-bar.show{display:flex}
+.sync-bar.error{background:var(--red-light);color:var(--red);border-color:var(--red)}
+.sync-bar.success{background:var(--green-light);color:var(--green);border-color:var(--green)}
+.sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sync-dot.syncing{background:var(--amber);animation:pulse 1s infinite}
+.sync-dot.synced{background:var(--green)}
+.sync-dot.offline{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.setup-banner{background:linear-gradient(135deg,#EEF2FF,#F5F3FF);border:2px dashed #7C3AED;border-radius:var(--radius-lg);padding:28px 24px;margin-bottom:24px;text-align:center}
+.setup-banner h3{font-family:var(--font-display);font-size:18px;font-weight:800;color:#4C1D95;margin-bottom:8px}
+.setup-banner p{font-size:13px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px}
+.setup-banner input{width:100%;padding:12px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;font-family:var(--font-body);direction:ltr;text-align:left;margin-bottom:12px;min-height:44px}
+.setup-banner input:focus{border-color:#7C3AED;box-shadow:0 0 0 3px rgba(124,58,237,0.15);outline:none}
+
+/* Header */
+.header{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-mid) 60%,var(--primary-light) 100%);border-radius:var(--radius-xl);padding:28px 32px;margin-bottom:24px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60%;left:-10%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.07) 0%,transparent 70%);pointer-events:none}
+.header-content{position:relative;z-index:1}
+.header h1{font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-0.3px;margin-bottom:4px}
+.header .sub{font-size:12px;opacity:0.7;font-weight:400}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+
+/* Buttons */
+.btn{padding:10px 20px;border-radius:var(--radius-sm);border:none;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all var(--tr-fast);display:inline-flex;align-items:center;gap:6px;line-height:1;min-height:44px}
+.btn:focus-visible{outline:2px solid var(--primary-light);outline-offset:2px}
+.btn-save{background:#fff;color:var(--primary);box-shadow:var(--shadow-sm)}
+.btn-save:hover{background:#F0FDFA;transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-ghost{background:rgba(255,255,255,0.12);color:#fff;border:1.5px solid rgba(255,255,255,0.2);backdrop-filter:blur(4px)}
+.btn-ghost:hover{background:rgba(255,255,255,0.2)}
+.btn-primary{background:var(--primary-mid);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,0.25)}
+.btn-primary:hover{background:var(--primary);transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,148,136,0.3)}
+.btn-outline{background:var(--surface);color:var(--text-primary);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--primary-mid);color:var(--primary-mid)}
+.btn-sm{padding:6px 14px;font-size:12px;min-height:36px;border-radius:var(--radius-xs)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--surface);border-radius:var(--radius-md);padding:18px 12px;text-align:center;box-shadow:var(--shadow-xs);border:1px solid var(--border-light);transition:all var(--tr-fast)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-num{font-family:var(--font-display);font-size:30px;font-weight:800;line-height:1}
+.stat-label{font-size:12px;color:var(--text-secondary);margin-top:6px;font-weight:500}
+.progress-ring-wrap{position:relative;width:52px;height:52px;margin:0 auto 6px}
+.progress-ring-wrap svg{width:52px;height:52px;transform:rotate(-90deg)}
+.progress-ring-wrap .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--green)}
+
+/* Toolbar */
+.toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.tabs{display:inline-flex;gap:2px;background:#E8ECF1;border-radius:var(--radius-sm);padding:4px}
+.tab{padding:10px 18px;border-radius:var(--radius-xs);border:none;background:transparent;color:var(--text-secondary);font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all var(--tr-fast);min-height:44px;display:inline-flex;align-items:center;gap:6px}
+.tab:hover{color:var(--text-primary)}.tab.active{background:var(--surface);color:var(--primary);box-shadow:var(--shadow-sm)}
+
+/* Filters */
+.filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.search-wrap{flex:1;min-width:160px;position:relative}
+.search-wrap .icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+.search-input{width:100%;padding:11px 42px 11px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;font-family:var(--font-body);direction:rtl;outline:none;background:var(--surface);transition:all var(--tr-fast);min-height:44px}
+.search-input:focus{border-color:var(--primary-mid);box-shadow:0 0 0 3px var(--primary-glow)}
+.filter-select{padding:11px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;font-family:var(--font-body);direction:rtl;outline:none;background:var(--surface);cursor:pointer;min-width:120px;min-height:44px;transition:all var(--tr-fast);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center}
+.filter-select:focus{border-color:var(--primary-mid);box-shadow:0 0 0 3px var(--primary-glow)}
+
+/* Calendar */
+.calendar-wrap{background:var(--surface);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);margin-bottom:24px}
+.cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.cal-title{font-family:var(--font-display);font-size:22px;font-weight:700}
+.cal-title span{font-size:15px;color:var(--text-secondary);margin-right:4px;font-weight:400}
+.cal-nav{width:44px;height:44px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast);color:var(--text-secondary)}
+.cal-nav:hover{border-color:var(--primary-mid);color:var(--primary-mid);background:var(--primary-surface)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-name{text-align:center;font-size:11px;font-weight:700;color:var(--text-muted);padding:8px 0;letter-spacing:0.5px}
+.cal-cell{min-height:58px;border-radius:var(--radius-xs);padding:6px 4px;text-align:center;background:var(--border-light);cursor:pointer;transition:all var(--tr-fast);display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid transparent}
+.cal-cell:hover{background:#E0F2F1;border-color:var(--primary-light)}
+.cal-cell .day-num{font-family:var(--font-display);font-size:15px;font-weight:500;color:var(--text-primary)}
+.cal-cell.today{background:var(--primary-surface);border-color:var(--primary-mid)}
+.cal-cell.today .day-num{font-weight:800;color:var(--primary)}
+.cal-cell.selected{background:var(--primary);border-color:var(--primary);box-shadow:0 4px 12px rgba(13,148,136,0.3)}
+.cal-cell.selected .day-num{color:#fff;font-weight:700}
+.cal-cell.overdue-day::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:18px;height:3px;background:var(--red);border-radius:2px}
+.cal-dots{display:flex;gap:3px;margin-top:4px;justify-content:center}
+.cal-dot{width:6px;height:6px;border-radius:50%}
+.today-btn{width:100%;margin-top:12px;padding:10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);color:var(--text-secondary);transition:all var(--tr-fast);min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px}
+.today-btn:hover{border-color:var(--primary-mid);color:var(--primary-mid);background:var(--primary-surface)}
+
+/* Section Headers */
+.section-group{margin-bottom:24px}
+.section-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-radius:var(--radius-md);cursor:pointer;transition:all var(--tr-fast);border:1.5px solid transparent;margin-bottom:2px;position:relative;overflow:hidden}
+.section-header::before{content:'';position:absolute;inset:0;opacity:0.06;pointer-events:none}
+.section-header:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.section-color-bar{width:5px;height:36px;border-radius:3px;flex-shrink:0}
+.section-icon-wrap{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-info{flex:1;min-width:0}
+.section-name{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--text-primary)}
+.section-meta{font-size:12px;color:var(--text-secondary);display:flex;gap:12px;align-items:center;margin-top:2px}
+.section-progress{flex:1;max-width:120px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.section-progress-fill{height:100%;border-radius:3px;transition:width var(--tr-slow)}
+.section-count{font-family:var(--font-display);font-size:13px;font-weight:700;min-width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.section-toggle{width:36px;height:36px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast);color:var(--text-muted);flex-shrink:0}
+.section-body{padding:4px 0 0 0;overflow:hidden;transition:max-height var(--tr-slow);max-height:2000px}
+.section-body.collapsed{max-height:0;padding:0}
+.section-actions{display:flex;gap:4px}
+.section-actions .icon-btn{width:36px;height:36px;border-radius:var(--radius-xs);border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast);color:var(--text-muted);min-width:44px;min-height:44px}
+.section-actions .icon-btn:hover{background:rgba(0,0,0,0.06);color:var(--text-primary)}
+
+/* Section Title */
+.section-title{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section-title .count{font-family:var(--font-body);font-size:12px;font-weight:600;background:var(--primary-surface);color:var(--primary-mid);padding:3px 12px;border-radius:20px}
+.section-title.overdue-title{color:var(--red)}.section-title.overdue-title .count{background:var(--red-light);color:var(--red)}
+
+/* Task Card */
+.task-card{background:var(--surface);border-radius:var(--radius-md);padding:18px 20px;margin-bottom:10px;box-shadow:var(--shadow-xs);border:1px solid var(--border-light);border-right:4px solid var(--border);transition:all var(--tr-fast)}
+.task-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.task-card.p-high{border-right-color:var(--red)}.task-card.p-medium{border-right-color:var(--amber)}.task-card.p-low{border-right-color:var(--primary-mid)}
+.task-card.is-overdue{background:#FFFBFB;border-color:#FEE2E2;border-right-color:var(--red)}
+.task-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.task-info{flex:1;min-width:0}
+.task-title-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.task-cat-icon{width:32px;height:32px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.task-cat-icon.planning{background:#DBEAFE;color:#2563EB}.task-cat-icon.meeting{background:#F3E8FF;color:#7C3AED}
+.task-cat-icon.report{background:#D1FAE5;color:#059669}.task-cat-icon.review{background:#FEF3C7;color:#D97706}
+.task-cat-icon.followup{background:#FCE7F3;color:#DB2777}.task-cat-icon.other{background:var(--border-light);color:var(--text-secondary)}
+.task-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text-primary)}
+.task-section-tag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.overdue-badge{font-size:11px;background:var(--red-light);color:var(--red);padding:2px 10px;border-radius:20px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+.task-desc{font-size:13px;color:var(--text-secondary);margin-bottom:10px;line-height:1.7}
+.task-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--text-secondary)}
+.task-meta-item{display:inline-flex;align-items:center;gap:4px}
+.status-badge{cursor:pointer;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid transparent;transition:all var(--tr-fast);font-family:var(--font-body);min-height:28px;display:inline-flex;align-items:center;gap:4px}
+.status-badge:hover{filter:brightness(0.92)}
+.priority-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center}
+.task-actions{display:flex;gap:4px;flex-shrink:0}
+.icon-btn{width:36px;height:36px;border-radius:var(--radius-xs);border:none;background:var(--border-light);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast);color:var(--text-muted);min-width:44px;min-height:44px}
+.icon-btn:hover{background:#E0F2F1;color:var(--primary-mid)}.icon-btn.delete:hover{background:var(--red-light);color:var(--red)}
+
+/* Progress */
+.progress-wrap{margin-top:10px;display:flex;align-items:center;gap:10px}
+.progress-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width var(--tr-slow)}
+.progress-fill.done{background:var(--green)}.progress-fill.partial{background:var(--primary-mid)}
+.progress-text{font-family:var(--font-display);font-size:12px;color:var(--text-secondary);font-weight:700;min-width:36px}
+
+/* Subtasks */
+.subtasks-panel{margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light)}
+.subtask-item{display:flex;align-items:center;gap:10px;padding:8px 0}
+.subtask-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast);flex-shrink:0;min-width:44px;min-height:44px;padding:12px}
+.subtask-cb.checked{background:var(--primary-mid);border-color:var(--primary-mid)}
+.subtask-cb.checked svg{opacity:1}.subtask-cb svg{opacity:0;transition:opacity var(--tr-fast)}
+.subtask-text{font-size:13px;color:var(--text-primary);flex:1}.subtask-text.done{color:var(--text-muted);text-decoration:line-through}
+.task-notes{margin-top:10px;padding:12px 16px;background:var(--border-light);border-radius:var(--radius-sm);font-size:12px;color:var(--text-secondary);line-height:1.8;border-right:3px solid var(--primary-light)}
+
+/* Empty */
+.empty-state{text-align:center;padding:40px 24px;background:var(--border-light);border-radius:var(--radius-md);border:2px dashed var(--border)}
+.empty-state p{color:var(--text-muted);font-size:14px;margin-top:8px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,41,0.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-xl);padding:32px 28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;direction:rtl;box-shadow:var(--shadow-xl);animation:modalSlide 300ms cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes modalSlide{from{opacity:0;transform:scale(0.94) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-header h2{font-family:var(--font-display);font-size:20px;font-weight:800}
+.modal-close{width:44px;height:44px;border-radius:var(--radius-xs);border:none;background:var(--border-light);cursor:pointer;color:var(--text-muted);transition:all var(--tr-fast);display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--red-light);color:var(--red)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.form-group{display:flex;flex-direction:column}.form-group.full{grid-column:1/-1}
+.form-label{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
+.form-input,.form-textarea,.form-select-field{padding:11px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;font-family:var(--font-body);direction:rtl;outline:none;background:var(--border-light);transition:all var(--tr-fast);min-height:44px}
+.form-input:focus,.form-textarea:focus,.form-select-field:focus{border-color:var(--primary-mid);box-shadow:0 0 0 3px var(--primary-glow);background:var(--surface)}
+.form-textarea{min-height:80px;resize:vertical}
+.priority-btns,.status-btns{display:flex;gap:8px;flex-wrap:wrap}
+.prio-btn{flex:1;padding:10px 4px;border-radius:var(--radius-xs);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all var(--tr-fast);text-align:center;border:2px solid var(--border);background:var(--surface);color:var(--text-secondary);min-height:44px}
+.prio-btn.a-high{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.prio-btn.a-medium{border-color:var(--amber);background:var(--amber-light);color:var(--amber)}
+.prio-btn.a-low{border-color:var(--primary-mid);background:var(--primary-surface);color:var(--primary-mid)}
+.stat-btn{flex:1;min-width:70px;padding:10px 6px;border-radius:var(--radius-xs);font-size:12px;font-weight:700;border:2px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;font-family:var(--font-body);transition:all var(--tr-fast);min-height:44px;text-align:center}
+.stat-btn.active{font-weight:800}
+.subtask-form-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.subtask-form-row .num{font-family:var(--font-display);font-size:13px;color:var(--text-muted);min-width:24px;font-weight:700}
+.subtask-form-row input{flex:1}
+.subtask-remove{width:44px;height:44px;border-radius:var(--radius-xs);border:none;background:var(--red-light);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast)}
+.subtask-remove:hover{background:#FECACA;transform:scale(1.05)}
+.form-actions{display:flex;gap:10px;margin-top:24px}.form-actions .btn{flex:1;padding:14px 20px;font-size:14px;justify-content:center}
+
+/* Section color chips in form */
+.section-chips{display:flex;gap:8px;flex-wrap:wrap}
+.section-chip{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all var(--tr-fast);border:2px solid transparent;min-height:44px;display:flex;align-items:center;gap:6px}
+.section-chip.active{border-width:2.5px;font-weight:800;transform:scale(1.02)}
+.section-chip .chip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Section manager */
+.section-manager-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--radius-sm);background:var(--border-light);margin-bottom:8px;border-right:4px solid var(--border)}
+.section-manager-item input{flex:1}
+.color-picker-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.color-dot{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all var(--tr-fast);min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+.color-dot:hover{transform:scale(1.1)}.color-dot.active{border-color:var(--text-primary);box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--text-primary)}
+
+@media(max-width:640px){.stats{grid-template-columns:repeat(3,1fr)}.form-grid{grid-template-columns:1fr}.header{padding:20px;border-radius:var(--radius-lg)}.header h1{font-size:22px}.cal-cell{min-height:48px}.app{padding:16px 12px 60px}}
+@media(max-width:420px){.stats{grid-template-columns:repeat(2,1fr)}.tabs{overflow-x:auto}.task-meta{font-size:11px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="toast" id="toast"></div>
+  <div class="sync-bar" id="syncBar"><span class="sync-dot syncing"></span> <span id="syncText">جاري المزامنة...</span></div>
+  <div class="setup-banner" id="setupBanner" style="display:none">
+    <h3>ربط قاعدة البيانات</h3>
+    <p>لحفظ بياناتك بشكل دائم، أدخل رابط Google Apps Script<br>راجع ملف README.md للتعليمات</p>
+    <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/XXXX.../exec" dir="ltr">
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-primary" onclick="connectAPI()">ربط</button>
+      <button class="btn btn-outline" onclick="skipSetup()">تخطي (حفظ محلي فقط)</button>
+    </div>
+  </div>
+  <div class="header">
+    <div class="header-content">
+      <h1>متتبع الأنشطة اليومية</h1>
+      <div class="sub" id="lastSaved">لم يتم الحفظ بعد</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-save" onclick="saveData()"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> حفظ</button>
+      <button class="btn btn-ghost" onclick="exportData()"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> تصدير</button>
+      <label class="btn btn-ghost" style="cursor:pointer"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> استيراد<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+    </div>
+  </div>
+  <div class="stats" id="statsPanel"></div>
+  <div class="toolbar">
+    <div class="tabs" role="tablist">
+      <button class="tab active" onclick="switchView('calendar',this)"><svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> التقويم</button>
+      <button class="tab" onclick="switchView('list',this)"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> القائمة</button>
+      <button class="tab" onclick="switchView('upcoming',this)"><svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> القادم</button>
+      <button class="tab" onclick="switchView('sections',this)"><svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> الأقسام</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="openSectionMgr()"><svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> إدارة الأقسام</button>
+      <button class="btn btn-primary" onclick="openForm()"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> نشاط جديد</button>
+    </div>
+  </div>
+  <div class="filters">
+    <div class="search-wrap"><svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="search-input" type="text" placeholder="بحث في الأنشطة..." id="searchInput" oninput="render()"></div>
+    <select class="filter-select" id="filterStatus" onchange="render()"><option value="all">كل الحالات</option><option value="pending">قيد الانتظار</option><option value="in_progress">قيد التنفيذ</option><option value="completed">مكتمل</option><option value="delayed">متأخر</option></select>
+    <select class="filter-select" id="filterPriority" onchange="render()"><option value="all">كل الأولويات</option><option value="high">عالي</option><option value="medium">متوسط</option><option value="low">منخفض</option></select>
+    <select class="filter-select" id="filterSection" onchange="render()"><option value="all">كل الأقسام</option></select>
+  </div>
+  <div id="content"></div>
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeForm()"><div class="modal" id="modal" role="dialog"></div></div>
+  <div class="modal-overlay" id="sectionModalOverlay" onclick="if(event.target===this)closeSectionMgr()"><div class="modal" id="sectionModal" role="dialog"></div></div>
+</div>
+
+<script>
+const SK='spf_activity_tracker_v5';
+const STATUS_OPTS=[{v:'pending',l:'قيد الانتظار',c:'#64748B'},{v:'in_progress',l:'قيد التنفيذ',c:'#D97706'},{v:'completed',l:'مكتمل',c:'#059669'},{v:'delayed',l:'متأخر',c:'#DC2626'}];
+const CATS=[{v:'planning',l:'تخطيط'},{v:'meeting',l:'اجتماع'},{v:'report',l:'تقرير'},{v:'review',l:'مراجعة'},{v:'followup',l:'متابعة'},{v:'other',l:'أخرى'}];
+const PMAP={high:{l:'عالي',bg:'#FEE2E2',c:'#DC2626'},medium:{l:'متوسط',bg:'#FEF3C7',c:'#D97706'},low:{l:'منخفض',bg:'#F0FDFA',c:'#0D9488'}};
+const MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const WDAYS=['اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت','أحد'];
+
+// Section color palette
+const SEC_COLORS=[
+  {id:'teal',c:'#0D9488',bg:'#F0FDFA',light:'#CCFBF1',text:'#134E4A'},
+  {id:'blue',c:'#2563EB',bg:'#EFF6FF',light:'#DBEAFE',text:'#1E3A8A'},
+  {id:'violet',c:'#7C3AED',bg:'#F5F3FF',light:'#EDE9FE',text:'#4C1D95'},
+  {id:'rose',c:'#E11D48',bg:'#FFF1F2',light:'#FCE7F3',text:'#881337'},
+  {id:'amber',c:'#D97706',bg:'#FFFBEB',light:'#FEF3C7',text:'#78350F'},
+  {id:'emerald',c:'#059669',bg:'#ECFDF5',light:'#D1FAE5',text:'#064E3B'},
+  {id:'indigo',c:'#4F46E5',bg:'#EEF2FF',light:'#E0E7FF',text:'#312E81'},
+  {id:'orange',c:'#EA580C',bg:'#FFF7ED',light:'#FFEDD5',text:'#9A3412'},
+  {id:'cyan',c:'#0891B2',bg:'#ECFEFF',light:'#CFFAFE',text:'#164E63'},
+  {id:'slate',c:'#475569',bg:'#F8FAFC',light:'#E2E8F0',text:'#0F172A'},
+];
+
+const DEFAULT_SECTIONS=[
+  {id:'strategic',name:'المشاريع الاستراتيجية',colorId:'blue',icon:'target'},
+  {id:'digital',name:'التحول الرقمي',colorId:'violet',icon:'cpu'},
+  {id:'performance',name:'الأداء المؤسسي',colorId:'emerald',icon:'trending'},
+  {id:'operations',name:'العمليات التشغيلية',colorId:'amber',icon:'settings'},
+  {id:'general',name:'مهام عامة',colorId:'slate',icon:'inbox'},
+];
+
+const SEC_ICONS={
+  target:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  cpu:'<svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+  trending:'<svg class="icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  settings:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+  inbox:'<svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>',
+  clipboard:'<svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
+  flag:'<svg class="icon" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+  star:'<svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  layers:'<svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+  zap:'<svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+};
+const ICON_KEYS=Object.keys(SEC_ICONS);
+
+const CAT_ICONS={
+  planning:'<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>',
+  meeting:'<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  report:'<svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  review:'<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  followup:'<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5A8.48 8.48 0 0121 11.5z"/></svg>',
+  other:'<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
+};
+
+let acts=[],sections=[],selDate=new Date(),curM=new Date().getMonth(),curY=new Date().getFullYear();
+let curView='calendar',editId=null,expanded={},collapsedSections={},lastSave='',formSubs=[];
+let API_URL=localStorage.getItem('tracker_api_url')||'';
+let isOnline=true,isSyncing=false;
+
+const gid=()=>Math.random().toString(36).substr(2,9);
+const fk=d=>{const t=new Date(d);return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`};
+const fd=d=>new Date(d).toLocaleDateString('ar-OM',{weekday:'short',day:'numeric',month:'short'});
+const isTod=d=>fk(d)===fk(new Date());
+const isOv=dl=>new Date(dl)<new Date(fk(new Date()));
+const dim=(y,m)=>new Date(y,m+1,0).getDate();
+const fdom=(y,m)=>{const d=new Date(y,m,1).getDay();return d===0?6:d-1};
+const esc=s=>{const d=document.createElement('div');d.textContent=s||'';return d.innerHTML};
+const getSC=id=>SEC_COLORS.find(c=>c.id===id)||SEC_COLORS[0];
+
+function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function showSync(msg,type){const b=document.getElementById('syncBar'),d=b.querySelector('.sync-dot'),t=document.getElementById('syncText');b.className='sync-bar show'+(type?' '+type:'');d.className='sync-dot '+(type==='success'?'synced':type==='error'?'offline':'syncing');t.textContent=msg;if(type==='success')setTimeout(()=>b.classList.remove('show'),3000)}
+
+function connectAPI(){
+  const url=document.getElementById('apiUrlInput').value.trim();
+  if(!url||!url.startsWith('https://script.google.com')){toast('الرابط غير صحيح');return}
+  API_URL=url;localStorage.setItem('tracker_api_url',url);
+  document.getElementById('setupBanner').style.display='none';
+  loadFromCloud();
+}
+function skipSetup(){document.getElementById('setupBanner').style.display='none';localStorage.setItem('tracker_setup_skipped','1')}
+
+// Load: Cloud first → localStorage fallback
+async function load(){
+  // Try defaults first
+  sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
+  // localStorage as immediate data
+  try{const s=localStorage.getItem(SK);if(s){const d=JSON.parse(s);acts=d.activities||[];sections=d.sections||DEFAULT_SECTIONS;lastSave=d.lastSaved||''}}catch(e){}
+  // Migrate from v4
+  if(!acts.length){try{const old=localStorage.getItem('spf_activity_tracker_v4');if(old){const d=JSON.parse(old);if(d.activities?.length){acts=d.activities.map(a=>({...a,sectionId:a.sectionId||'general'}));sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));lastSave=d.lastSaved||''}}}catch(e){}}
+  if(!sections.length)sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
+  render();
+  // Check if API is configured
+  if(!API_URL){
+    if(!localStorage.getItem('tracker_setup_skipped'))document.getElementById('setupBanner').style.display='block';
+    return;
+  }
+  // Cloud sync
+  await loadFromCloud();
+}
+
+async function loadFromCloud(){
+  if(!API_URL)return;
+  try{
+    showSync('جاري تحميل البيانات...','');
+    const r=await fetch(API_URL,{redirect:'follow'});
+    const text=await r.text();
+    let d;
+    try{d=JSON.parse(text)}catch{throw new Error('Invalid JSON response')}
+    if(d.error)throw new Error(d.error);
+    if(d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
+      localStorage.setItem(SK,JSON.stringify(d));
+      render();showSync('تم المزامنة','success');isOnline=true}
+    else if(d.activities===undefined&&!d.error){
+      // Empty sheet — initialize
+      showSync('تم الاتصال — قاعدة بيانات جديدة','success');isOnline=true}
+    else showSync('تم الاتصال','success');
+  }catch(e){
+    isOnline=false;showSync('وضع عدم الاتصال — البيانات محلية','error');
+    console.error('Cloud load failed:',e);
+  }
+}
+
+function persistLocal(){
+  const d={activities:acts,sections,lastSaved:new Date().toLocaleString('ar-OM')};
+  lastSave=d.lastSaved;localStorage.setItem(SK,JSON.stringify(d));
+  document.getElementById('lastSaved').textContent='آخر حفظ: '+lastSave;
+}
+
+async function persistCloud(){
+  if(!API_URL)return;
+  try{
+    isSyncing=true;showSync('جاري الحفظ...','');
+    const payload=JSON.stringify({activities:acts,sections,lastSaved:lastSave});
+    // Use a form POST via hidden iframe to avoid CORS issues with Google Apps Script
+    await new Promise((resolve,reject)=>{
+      const form=document.createElement('form');
+      form.method='POST';form.action=API_URL;form.target='_saveFrame';
+      form.style.display='none';
+      const input=document.createElement('textarea');
+      input.name='payload';input.value=payload;
+      form.appendChild(input);
+      // Create hidden iframe
+      let iframe=document.getElementById('_saveFrame');
+      if(!iframe){iframe=document.createElement('iframe');iframe.name='_saveFrame';iframe.id='_saveFrame';iframe.style.display='none';document.body.appendChild(iframe)}
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+      // Assume success after short delay
+      setTimeout(resolve,1500);
+    });
+    showSync('تم الحفظ والمزامنة','success');isOnline=true;
+  }catch(e){
+    isOnline=false;showSync('تعذر المزامنة — محفوظ محلياً','error');
+    console.error('Cloud save failed:',e);
+  }finally{isSyncing=false}
+}
+
+async function persist(){persistLocal();await persistCloud()}
+async function saveData(){persistLocal();await persistCloud();toast('<svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg> تم الحفظ')}
+function exportData(){const b=new Blob([JSON.stringify({activities:acts,sections,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`activities_${fk(new Date())}.json`;a.click();toast('تم تصدير البيانات')}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{try{const d=JSON.parse(ev.target.result);if(d.activities){acts=d.activities;if(d.sections)sections=d.sections;await persist();render();toast('تم استيراد البيانات')}}catch{toast('خطأ في الملف')}};r.readAsText(f);e.target.value=''}
+
+function updateSectionFilter(){
+  const sel=document.getElementById('filterSection');
+  const cur=sel.value;
+  sel.innerHTML='<option value="all">كل الأقسام</option>'+sections.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  sel.value=cur;
+}
+
+function switchView(v,btn){curView=v;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');render()}
+function getFiltered(){
+  const q=document.getElementById('searchInput').value,fs=document.getElementById('filterStatus').value,fp=document.getElementById('filterPriority').value,fsc=document.getElementById('filterSection').value;
+  return acts.filter(a=>{
+    if(fs!=='all'&&a.status!==fs)return false;if(fp!=='all'&&a.priority!==fp)return false;
+    if(fsc!=='all'&&a.sectionId!==fsc)return false;
+    if(q&&!a.title.includes(q)&&!(a.description||'').includes(q))return false;return true;
+  });
+}
+function getDA(date){const k=fk(date);return acts.filter(a=>a.deadline===k||a.startDate===k||(a.startDate<=k&&a.deadline>=k))}
+
+function renderStats(){
+  const t=acts.length,c=acts.filter(a=>a.status==='completed').length,p=acts.filter(a=>a.status==='in_progress').length,o=acts.filter(a=>a.status!=='completed'&&isOv(a.deadline)).length;
+  const pct=t>0?Math.round((c/t)*100):0;
+  document.getElementById('statsPanel').innerHTML=`
+    <div class="stat-card"><div class="stat-num" style="color:var(--primary)">${t}</div><div class="stat-label">إجمالي</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${c}</div><div class="stat-label">مكتمل</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--amber)">${p}</div><div class="stat-label">جاري</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--red)">${o}</div><div class="stat-label">متأخر</div></div>
+    <div class="stat-card"><div class="progress-ring-wrap"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="var(--border)" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="var(--green)" stroke-width="3" stroke-dasharray="${pct*0.942} 100" stroke-linecap="round"/></svg><div class="pct">${pct}%</div></div><div class="stat-label">الإنجاز</div></div>`;
+}
+
+function taskCard(a,showSectionTag){
+  const pm=PMAP[a.priority],st=STATUS_OPTS.find(x=>x.v===a.status),ov=a.status!=='completed'&&isOv(a.deadline);
+  const isE=expanded[a.id],sd=(a.subtasks||[]).filter(x=>x.completed).length,stl=(a.subtasks||[]).length;
+  const prog=stl>0?(sd/stl)*100:a.status==='completed'?100:a.status==='in_progress'?50:0;
+  const catIcon=CAT_ICONS[a.category]||CAT_ICONS.other;
+  const sec=sections.find(s=>s.id===a.sectionId);
+  const sc=sec?getSC(sec.colorId):null;
+  let secTag='';
+  if(showSectionTag&&sec&&sc){secTag=`<span class="task-section-tag" style="background:${sc.light};color:${sc.c}">${sec.name}</span>`}
+  let subs='';
+  if(isE&&stl>0){subs=`<div class="subtasks-panel">${(a.subtasks||[]).map(s=>`<div class="subtask-item"><div class="subtask-cb ${s.completed?'checked':''}" onclick="toggleSub('${a.id}','${s.id}')"><svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff;width:14px;height:14px"><polyline points="20 6 9 17 4 12"/></svg></div><span class="subtask-text ${s.completed?'done':''}">${esc(s.title)}</span></div>`).join('')}</div>`}
+  let notes='';if(isE&&a.notes){notes=`<div class="task-notes">${esc(a.notes)}</div>`}
+  return`<div class="task-card p-${a.priority} ${ov?'is-overdue':''}">
+    <div class="task-top"><div class="task-info">
+      <div class="task-title-row"><div class="task-cat-icon ${a.category||'other'}">${catIcon}</div><span class="task-title">${esc(a.title)}</span>${secTag}${ov?'<span class="overdue-badge"><svg class="icon" style="width:12px;height:12px" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> متأخر</span>':''}</div>
+      ${a.description?`<div class="task-desc">${esc(a.description)}</div>`:''}
+      <div class="task-meta"><span class="task-meta-item"><svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${fd(a.startDate)} → ${fd(a.deadline)}</span>
+        ${a.estimatedHours?`<span class="task-meta-item"><svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${a.estimatedHours} ساعة</span>`:''}
+        <button class="status-badge" onclick="toggleStatus('${a.id}')" style="background:${st.c}14;color:${st.c};border-color:${st.c}40">${st.l}</button>
+        <span class="priority-badge" style="background:${pm.bg};color:${pm.c}">${pm.l}</span></div>
+      ${stl>0?`<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${prog===100?'done':'partial'}" style="width:${prog}%"></div></div><span class="progress-text">${sd}/${stl}</span></div>`:''}
+    </div><div class="task-actions">
+      ${stl>0?`<button class="icon-btn" onclick="toggleExp('${a.id}')"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="${isE?'18 15 12 9 6 15':'6 9 12 15 18 9'}"/></svg></button>`:''}
+      <button class="icon-btn" onclick="editAct('${a.id}')"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="icon-btn delete" onclick="delAct('${a.id}')"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+    </div></div>${subs}${notes}</div>`;
+}
+
+function renderSectionGroup(sec,tasksArr){
+  const sc=getSC(sec.colorId);const isCol=collapsedSections[sec.id];
+  const done=tasksArr.filter(a=>a.status==='completed').length;
+  const prog=tasksArr.length>0?Math.round((done/tasksArr.length)*100):0;
+  const icon=SEC_ICONS[sec.icon]||SEC_ICONS.inbox;
+  return`<div class="section-group">
+    <div class="section-header" style="background:${sc.bg};border-color:${sc.light}" onclick="toggleSection('${sec.id}')">
+      <div class="section-color-bar" style="background:${sc.c}"></div>
+      <div class="section-icon-wrap" style="background:${sc.light};color:${sc.c}">${icon}</div>
+      <div class="section-info"><div class="section-name">${esc(sec.name)}</div>
+        <div class="section-meta"><div class="section-progress"><div class="section-progress-fill" style="width:${prog}%;background:${sc.c}"></div></div><span style="font-weight:700;color:${sc.c}">${prog}%</span><span>${done}/${tasksArr.length} مكتمل</span></div>
+      </div>
+      <div class="section-count" style="background:${sc.light};color:${sc.c}">${tasksArr.length}</div>
+      <div class="section-toggle"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="${isCol?'6 9 12 15 18 9':'18 15 12 9 6 15'}"/></svg></div>
+    </div>
+    <div class="section-body ${isCol?'collapsed':''}">
+      ${tasksArr.length===0?`<div class="empty-state" style="margin:8px 0;padding:24px"><p>لا توجد أنشطة في هذا القسم</p></div>`:tasksArr.map(a=>taskCard(a,false)).join('')}
+    </div>
+  </div>`;
+}
+
+function renderCal(){
+  const days=dim(curY,curM),start=fdom(curY,curM);let cells='';
+  for(let i=0;i<start;i++)cells+='<div></div>';
+  for(let d=1;d<=days;d++){
+    const date=new Date(curY,curM,d),k=fk(date),da=getDA(date);
+    const isSel=fk(selDate)===k,isT=isTod(date)&&!isSel;
+    const hasOv=da.some(a=>a.status!=='completed'&&isOv(a.deadline)&&a.deadline===k);
+    let dots=da.slice(0,4).map(a=>{const sec=sections.find(s=>s.id===a.sectionId);const sc=sec?getSC(sec.colorId):null;return`<span class="cal-dot" style="background:${sc?sc.c:PMAP[a.priority].c}"></span>`}).join('');
+    cells+=`<div class="cal-cell ${isSel?'selected':''} ${isT?'today':''} ${hasOv&&!isSel?'overdue-day':''}" onclick="selD(${curY},${curM},${d})"><span class="day-num">${d}</span>${da.length?`<div class="cal-dots">${dots}</div>`:''}</div>`;
+  }
+  const fil=getFiltered(),sk=fk(selDate);
+  const sa=fil.filter(a=>a.deadline===sk||a.startDate===sk||(a.startDate<=sk&&a.deadline>=sk));
+  // Group by section
+  let taskHtml='';
+  if(sa.length===0){taskHtml='<div class="empty-state"><svg class="icon-lg" viewBox="0 0 24 24" style="width:48px;height:48px;stroke:var(--text-muted);margin-bottom:8px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p>لا توجد أنشطة في هذا اليوم</p></div>'}
+  else{taskHtml=sa.map(a=>taskCard(a,true)).join('')}
+  document.getElementById('content').innerHTML=`
+    <div class="calendar-wrap">
+      <div class="cal-header"><button class="cal-nav" onclick="prevM()"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button><div class="cal-title">${MONTHS[curM]} <span>${curY}</span></div><button class="cal-nav" onclick="nextM()"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button></div>
+      <div class="cal-grid">${WDAYS.map(d=>`<div class="cal-day-name">${d}</div>`).join('')}${cells}</div>
+      <button class="today-btn" onclick="goTod()"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> اليوم</button>
+    </div>
+    <div class="section-title">أنشطة ${fd(selDate)} <span class="count">${sa.length}</span></div>
+    ${taskHtml}`;
+}
+
+function renderList(){
+  const f=getFiltered().sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+  document.getElementById('content').innerHTML=`<div class="section-title">جميع الأنشطة <span class="count">${f.length}</span></div>${f.length===0?'<div class="empty-state"><p>لا توجد أنشطة</p></div>':f.map(a=>taskCard(a,true)).join('')}`;
+}
+
+function renderSections(){
+  const f=getFiltered();
+  let html='';
+  sections.forEach(sec=>{
+    const secTasks=f.filter(a=>a.sectionId===sec.id).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+    html+=renderSectionGroup(sec,secTasks);
+  });
+  // Unassigned
+  const unassigned=f.filter(a=>!sections.find(s=>s.id===a.sectionId));
+  if(unassigned.length){html+=renderSectionGroup({id:'_unassigned',name:'بدون قسم',colorId:'slate',icon:'inbox'},unassigned)}
+  document.getElementById('content').innerHTML=html||'<div class="empty-state"><p>لا توجد أنشطة</p></div>';
+}
+
+function renderUp(){
+  const ov=acts.filter(a=>a.status!=='completed'&&isOv(a.deadline)).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+  const up=acts.filter(a=>a.status!=='completed'&&!isOv(a.deadline)).sort((a,b)=>new Date(a.deadline)-new Date(b.deadline)).slice(0,10);
+  let h='';
+  if(ov.length){h+=`<div class="section-title overdue-title"><svg class="icon" viewBox="0 0 24 24" style="color:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> متأخرة <span class="count">${ov.length}</span></div>${ov.map(a=>taskCard(a,true)).join('')}<div style="height:20px"></div>`}
+  h+=`<div class="section-title">قادمة <span class="count">${up.length}</span></div>`;
+  h+=up.length===0?'<div class="empty-state"><p>لا توجد مواعيد قادمة</p></div>':up.map(a=>taskCard(a,true)).join('');
+  document.getElementById('content').innerHTML=h;
+}
+
+function render(){renderStats();updateSectionFilter();if(lastSave)document.getElementById('lastSaved').textContent='آخر حفظ: '+lastSave;
+  if(curView==='calendar')renderCal();else if(curView==='list')renderList();else if(curView==='sections')renderSections();else renderUp()}
+
+function selD(y,m,d){selDate=new Date(y,m,d);render()}
+function prevM(){if(curM===0){curM=11;curY--}else curM--;render()}
+function nextM(){if(curM===11){curM=0;curY++}else curM++;render()}
+function goTod(){const t=new Date();selDate=t;curM=t.getMonth();curY=t.getFullYear();render()}
+function toggleStatus(id){const a=acts.find(x=>x.id===id);if(!a)return;const i=STATUS_OPTS.findIndex(s=>s.v===a.status);a.status=STATUS_OPTS[(i+1)%STATUS_OPTS.length].v;persistLocal();render();persistCloud()}
+function toggleExp(id){expanded[id]=!expanded[id];render()}
+function toggleSection(id){collapsedSections[id]=!collapsedSections[id];render()}
+function toggleSub(aid,sid){const a=acts.find(x=>x.id===aid);if(!a)return;const s=(a.subtasks||[]).find(x=>x.id===sid);if(!s)return;s.completed=!s.completed;if(a.subtasks.length>0&&a.subtasks.every(x=>x.completed))a.status='completed';else if(a.status==='completed')a.status='in_progress';persistLocal();render();persistCloud()}
+function delAct(id){acts=acts.filter(a=>a.id!==id);persistLocal();render();persistCloud();toast('تم حذف النشاط')}
+function editAct(id){editId=id;openForm()}
+
+// Activity Form
+function openForm(){
+  const a=editId?acts.find(x=>x.id===editId):null;
+  formSubs=a?JSON.parse(JSON.stringify(a.subtasks||[])):[];
+  renderForm(a);document.getElementById('modalOverlay').classList.add('open');
+}
+function closeForm(){document.getElementById('modalOverlay').classList.remove('open');editId=null;formSubs=[]}
+
+function renderForm(a){
+  const td=fk(selDate);
+  const secChips=sections.map(s=>{
+    const sc=getSC(s.colorId);const isActive=(a?.sectionId||sections[0]?.id)===s.id;
+    return`<div class="section-chip ${isActive?'active':''}" style="background:${isActive?sc.light:sc.bg};color:${sc.c};border-color:${isActive?sc.c:'transparent'}" onclick="setFormSection(this,'${s.id}')"><span class="chip-dot" style="background:${sc.c}"></span>${esc(s.name)}</div>`;
+  }).join('');
+
+  document.getElementById('modal').innerHTML=`
+    <div class="modal-header"><h2>${editId?'تعديل النشاط':'نشاط جديد'}</h2><button class="modal-close" onclick="closeForm()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">القسم</label><div class="section-chips" id="secChips">${secChips}</div></div>
+      <div class="form-group"><label class="form-label">العنوان *</label><input class="form-input" id="f_t" value="${esc(a?.title||'')}" placeholder="عنوان النشاط"></div>
+      <div class="form-group"><label class="form-label">التصنيف</label><select class="form-select-field" id="f_cat">${CATS.map(c=>`<option value="${c.v}" ${(a?.category||'other')===c.v?'selected':''}>${c.l}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">تاريخ البدء</label><input class="form-input" type="date" id="f_s" value="${a?.startDate||td}"></div>
+      <div class="form-group"><label class="form-label">الموعد النهائي</label><input class="form-input" type="date" id="f_dl" value="${a?.deadline||td}"></div>
+      <div class="form-group"><label class="form-label">الأولوية</label><div class="priority-btns"><button class="prio-btn ${(a?.priority||'medium')==='high'?'a-high':''}" onclick="setPr(this,'high')">عالي</button><button class="prio-btn ${(a?.priority||'medium')==='medium'?'a-medium':''}" onclick="setPr(this,'medium')">متوسط</button><button class="prio-btn ${(a?.priority||'medium')==='low'?'a-low':''}" onclick="setPr(this,'low')">منخفض</button></div></div>
+      <div class="form-group"><label class="form-label">المدة (ساعات)</label><input class="form-input" type="number" min="0" step="0.5" id="f_h" value="${a?.estimatedHours||''}" placeholder="2.5"></div>
+      <div class="form-group full"><label class="form-label">الوصف</label><textarea class="form-textarea" id="f_d" placeholder="وصف تفصيلي...">${esc(a?.description||'')}</textarea></div>
+      <div class="form-group full"><label class="form-label">ملاحظات</label><textarea class="form-textarea" id="f_n" style="min-height:60px" placeholder="ملاحظات...">${esc(a?.notes||'')}</textarea></div>
+      <div class="form-group full"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><label class="form-label" style="margin:0">المهام الفرعية</label><button class="btn btn-outline btn-sm" onclick="addFS()"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة</button></div><div id="fsl">${renderFS()}</div></div>
+      <div class="form-group full"><label class="form-label">الحالة</label><div class="status-btns">${STATUS_OPTS.map(s=>`<button class="stat-btn ${(a?.status||'pending')===s.v?'active':''}" onclick="setSt(this,'${s.v}')" style="${(a?.status||'pending')===s.v?`border-color:${s.c};background:${s.c}14;color:${s.c}`:''}">${s.l}</button>`).join('')}</div></div>
+    </div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="submit()"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ${editId?'تحديث':'إضافة'}</button><button class="btn btn-outline" onclick="closeForm()" style="flex:0.4">إلغاء</button></div>`;
+  document.getElementById('modal').dataset.priority=a?.priority||'medium';
+  document.getElementById('modal').dataset.status=a?.status||'pending';
+  document.getElementById('modal').dataset.section=a?.sectionId||sections[0]?.id||'general';
+}
+
+function setFormSection(el,id){
+  document.getElementById('modal').dataset.section=id;
+  document.querySelectorAll('#secChips .section-chip').forEach(c=>{c.classList.remove('active');c.style.borderColor='transparent'});
+  el.classList.add('active');
+  const sec=sections.find(s=>s.id===id);if(sec){const sc=getSC(sec.colorId);el.style.borderColor=sc.c;el.style.background=sc.light}
+}
+
+function renderFS(){return formSubs.map((s,i)=>`<div class="subtask-form-row"><span class="num">${i+1}.</span><input class="form-input" style="margin:0" value="${esc(s.title)}" placeholder="عنوان المهمة الفرعية" onchange="upFS('${s.id}',this.value)"><button class="subtask-remove" onclick="rmFS('${s.id}')"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join('')}
+function addFS(){formSubs.push({id:gid(),title:'',completed:false});document.getElementById('fsl').innerHTML=renderFS();const ins=document.getElementById('fsl').querySelectorAll('input');if(ins.length)ins[ins.length-1].focus()}
+function upFS(id,v){const s=formSubs.find(x=>x.id===id);if(s)s.title=v}
+function rmFS(id){formSubs=formSubs.filter(x=>x.id!==id);document.getElementById('fsl').innerHTML=renderFS()}
+function setPr(btn,v){document.getElementById('modal').dataset.priority=v;btn.parentElement.querySelectorAll('.prio-btn').forEach(b=>b.className='prio-btn');btn.classList.add('a-'+v)}
+function setSt(btn,v){document.getElementById('modal').dataset.status=v;const s=STATUS_OPTS.find(x=>x.v===v);btn.parentElement.querySelectorAll('.stat-btn').forEach(b=>{b.className='stat-btn';b.style=''});btn.classList.add('active');btn.style=`border-color:${s.c};background:${s.c}14;color:${s.c}`}
+
+function submit(){
+  const title=document.getElementById('f_t').value.trim();if(!title){toast('يرجى إدخال عنوان النشاط');return}
+  const data={title,description:document.getElementById('f_d').value.trim(),startDate:document.getElementById('f_s').value,deadline:document.getElementById('f_dl').value,priority:document.getElementById('modal').dataset.priority,status:document.getElementById('modal').dataset.status,category:document.getElementById('f_cat').value,estimatedHours:document.getElementById('f_h').value,notes:document.getElementById('f_n').value.trim(),subtasks:formSubs.filter(s=>s.title.trim()),sectionId:document.getElementById('modal').dataset.section};
+  if(editId){const i=acts.findIndex(a=>a.id===editId);if(i>=0)acts[i]={...acts[i],...data};toast('تم تحديث النشاط')}
+  else{acts.push({...data,id:gid(),createdAt:new Date().toISOString()});toast('تم إضافة النشاط')}
+  persistLocal();closeForm();render();persistCloud();
+}
+
+// Section Manager
+function openSectionMgr(){renderSectionMgr();document.getElementById('sectionModalOverlay').classList.add('open')}
+function closeSectionMgr(){document.getElementById('sectionModalOverlay').classList.remove('open')}
+
+function renderSectionMgr(){
+  const iconOptions=ICON_KEYS.map(k=>`<button class="icon-btn" data-icon="${k}" onclick="setSectionIcon(this)" style="width:36px;height:36px;min-width:36px;min-height:36px">${SEC_ICONS[k]}</button>`).join('');
+  let items=sections.map((s,i)=>{
+    const sc=getSC(s.colorId);const taskCount=acts.filter(a=>a.sectionId===s.id).length;
+    return`<div class="section-manager-item" style="border-right-color:${sc.c}" data-idx="${i}">
+      <div class="section-icon-wrap" style="background:${sc.light};color:${sc.c};width:36px;height:36px;min-width:36px;border-radius:8px;display:flex;align-items:center;justify-content:center">${SEC_ICONS[s.icon]||SEC_ICONS.inbox}</div>
+      <div style="flex:1;min-width:0"><input class="form-input" style="margin:0;font-weight:700" value="${esc(s.name)}" onchange="updateSecName(${i},this.value)">
+        <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">${SEC_COLORS.map(c=>`<div class="color-dot ${s.colorId===c.id?'active':''}" style="background:${c.c};width:28px;height:28px;min-width:28px;min-height:28px" onclick="updateSecColor(${i},'${c.id}')"></div>`).join('')}</div>
+      </div>
+      <div style="text-align:center"><span style="font-size:12px;color:var(--text-muted)">${taskCount} نشاط</span>
+        ${taskCount===0?`<button class="btn btn-sm" style="margin-top:4px;color:var(--red);background:var(--red-light);border:none;padding:4px 10px" onclick="delSection(${i})"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>`:''}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('sectionModal').innerHTML=`
+    <div class="modal-header"><h2>إدارة الأقسام</h2><button class="modal-close" onclick="closeSectionMgr()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div id="sectionItems">${items}</div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-primary" style="flex:1" onclick="addSection()"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة قسم جديد</button>
+    </div>
+    <div class="form-actions"><button class="btn btn-primary" onclick="closeSectionMgr();render()">تم</button></div>`;
+}
+
+function updateSecName(i,v){sections[i].name=v;persistLocal();persistCloud()}
+function updateSecColor(i,cid){sections[i].colorId=cid;persistLocal();persistCloud();renderSectionMgr()}
+function addSection(){
+  const usedColors=sections.map(s=>s.colorId);
+  const availColor=SEC_COLORS.find(c=>!usedColors.includes(c.id))||SEC_COLORS[0];
+  sections.push({id:gid(),name:'قسم جديد',colorId:availColor.id,icon:'flag'});
+  persistLocal();persistCloud();renderSectionMgr();
+}
+function delSection(i){sections.splice(i,1);persistLocal();persistCloud();renderSectionMgr()}
+
+load();
+</script>
+</body>
+</html>
