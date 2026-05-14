@@ -408,30 +408,23 @@ async function loadFromCloud(){
   if(!API_URL)return;
   try{
     showSync('جاري تحميل البيانات...','');
-    // Use JSONP-style callback via script tag to avoid CORS
-    const d = await new Promise((resolve,reject)=>{
-      const cbName='_cb_'+Date.now();
-      const timeout=setTimeout(()=>{delete window[cbName];reject(new Error('Timeout'))},15000);
-      window[cbName]=function(data){clearTimeout(timeout);delete window[cbName];resolve(data)};
-      const script=document.createElement('script');
-      script.src=API_URL+'?callback='+cbName;
-      script.onerror=()=>{clearTimeout(timeout);delete window[cbName];reject(new Error('Script load failed'))};
-      document.head.appendChild(script);
-      script.onload=()=>document.head.removeChild(script);
-    });
+    // Read directly from published Google Sheet (no CORS issues)
+    const sheetUrl='https://docs.google.com/spreadsheets/d/19_kIDY4ydgMoL1OnAGxWDfMW_G8DlcVc_1LEr_SRAHQ/gviz/tq?tqx=out:csv&sheet=TrackerData&range=A2';
+    const r=await fetch(sheetUrl);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    let text=await r.text();
+    // CSV wraps value in quotes — remove them
+    text=text.trim();
+    if(text.startsWith('"'))text=text.slice(1);
+    if(text.endsWith('"'))text=text.slice(0,-1);
+    // Unescape doubled quotes
+    text=text.replace(/""/g,'"');
+    const d=JSON.parse(text);
     if(d&&d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
       localStorage.setItem(SK,JSON.stringify(d));
       render();showSync('تم المزامنة','success');isOnline=true}
     else showSync('تم الاتصال — قاعدة بيانات جديدة','success');
   }catch(e){
-    // Fallback: try regular fetch
-    try{
-      const r=await fetch(API_URL,{redirect:'follow'});
-      const text=await r.text();
-      const d=JSON.parse(text);
-      if(d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
-        localStorage.setItem(SK,JSON.stringify(d));render();showSync('تم المزامنة','success');isOnline=true;return}
-    }catch(e2){}
     isOnline=false;showSync('وضع عدم الاتصال — البيانات محلية','error');
     console.error('Cloud load failed:',e);
   }
