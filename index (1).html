@@ -408,19 +408,30 @@ async function loadFromCloud(){
   if(!API_URL)return;
   try{
     showSync('جاري تحميل البيانات...','');
-    const r=await fetch(API_URL,{redirect:'follow'});
-    const text=await r.text();
-    let d;
-    try{d=JSON.parse(text)}catch{throw new Error('Invalid JSON response')}
-    if(d.error)throw new Error(d.error);
-    if(d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
+    // Use JSONP-style callback via script tag to avoid CORS
+    const d = await new Promise((resolve,reject)=>{
+      const cbName='_cb_'+Date.now();
+      const timeout=setTimeout(()=>{delete window[cbName];reject(new Error('Timeout'))},15000);
+      window[cbName]=function(data){clearTimeout(timeout);delete window[cbName];resolve(data)};
+      const script=document.createElement('script');
+      script.src=API_URL+'?callback='+cbName;
+      script.onerror=()=>{clearTimeout(timeout);delete window[cbName];reject(new Error('Script load failed'))};
+      document.head.appendChild(script);
+      script.onload=()=>document.head.removeChild(script);
+    });
+    if(d&&d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
       localStorage.setItem(SK,JSON.stringify(d));
       render();showSync('تم المزامنة','success');isOnline=true}
-    else if(d.activities===undefined&&!d.error){
-      // Empty sheet — initialize
-      showSync('تم الاتصال — قاعدة بيانات جديدة','success');isOnline=true}
-    else showSync('تم الاتصال','success');
+    else showSync('تم الاتصال — قاعدة بيانات جديدة','success');
   }catch(e){
+    // Fallback: try regular fetch
+    try{
+      const r=await fetch(API_URL,{redirect:'follow'});
+      const text=await r.text();
+      const d=JSON.parse(text);
+      if(d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
+        localStorage.setItem(SK,JSON.stringify(d));render();showSync('تم المزامنة','success');isOnline=true;return}
+    }catch(e2){}
     isOnline=false;showSync('وضع عدم الاتصال — البيانات محلية','error');
     console.error('Cloud load failed:',e);
   }
