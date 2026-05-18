@@ -277,6 +277,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
     </div>
     <div class="header-actions">
       <button class="btn btn-save" onclick="saveData()"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> حفظ</button>
+      <button class="btn btn-ghost" onclick="manualSync()"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> مزامنة</button>
       <button class="btn btn-ghost" onclick="exportData()"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> تصدير</button>
       <label class="btn btn-ghost" style="cursor:pointer"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> استيراد<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
     </div>
@@ -384,20 +385,45 @@ async function connectAPI(){
   GH_TOKEN=token;localStorage.setItem('gh_token',token);
   showSync('جاري التحقق...','');
   try{
-    // Test token by fetching repo info
+    // Step 1: Test read access
     const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO,{
       headers:{'Authorization':'Bearer '+GH_TOKEN}
     });
-    if(!r.ok)throw new Error('Token invalid or no access');
+    if(!r.ok){const err=await r.json();throw new Error('قراءة: '+( err.message||r.status))}
+    
+    // Step 2: Test write access by creating/updating data.json
+    showSync('جاري اختبار الكتابة...','');
+    const initData={activities:acts.length?acts:[],sections:sections,lastSaved:new Date().toLocaleString('ar-OM')};
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(initData,null,2))));
+    
+    // Check if data.json exists
+    let sha='';
+    try{
+      const fileR=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+        headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
+      });
+      if(fileR.ok){const f=await fileR.json();sha=f.sha}
+    }catch(e){}
+    
+    const writeBody={message:'Init tracker data',content:content};
+    if(sha)writeBody.sha=sha;
+    const wr=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      body:JSON.stringify(writeBody)
+    });
+    if(!wr.ok){const err=await wr.json();throw new Error('كتابة: '+(err.message||wr.status))}
+    const wrData=await wr.json();
+    GH_SHA=wrData.content.sha;
+    
     document.getElementById('setupBanner').style.display='none';
-    showSync('تم الربط بنجاح','success');
-    // Try to load existing data or create new
-    await loadFromCloud();
-    if(acts.length)await persistCloud();
-    toast('تم الربط — البيانات تتزامن تلقائياً');
+    showSync('تم الربط — القراءة والكتابة شغالة','success');
+    toast('تم الربط بنجاح');
+    render();
   }catch(e){
-    console.error(e);toast('خطأ — تأكد من التوكن والصلاحيات');
-    showSync('فشل الربط','error');
+    console.error(e);
+    toast('خطأ: '+e.message);
+    showSync('فشل: '+e.message,'error');
   }
 }
 function skipSetup(){document.getElementById('setupBanner').style.display='none';localStorage.setItem('tracker_setup_skipped','1')}
@@ -454,8 +480,15 @@ async function persistCloud(){
   if(!GH_TOKEN)return;
   try{
     isSyncing=true;showSync('جاري الحفظ...','');
+    // Always get latest SHA before writing to avoid conflicts
+    try{
+      const chk=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+        headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'},cache:'no-store'
+      });
+      if(chk.ok){const f=await chk.json();GH_SHA=f.sha}
+    }catch(e){}
+    
     const jsonStr=JSON.stringify({activities:acts,sections,lastSaved:lastSave},null,2);
-    // Encode to base64 (handle Arabic/UTF-8)
     const content=btoa(unescape(encodeURIComponent(jsonStr)));
     const body={message:'Update tracker data',content:content};
     if(GH_SHA)body.sha=GH_SHA;
@@ -469,19 +502,19 @@ async function persistCloud(){
     GH_SHA=data.content.sha;
     showSync('تم الحفظ والمزامنة','success');isOnline=true;
   }catch(e){
-    // If conflict (sha mismatch), reload and retry
-    if(e.message&&e.message.includes('does not match')){
-      showSync('جاري إعادة المزامنة...','');
-      await loadFromCloud();
-      return persistCloud();
-    }
-    isOnline=false;showSync('تعذر المزامنة — محفوظ محلياً','error');
+    isOnline=false;showSync('خطأ في الحفظ: '+e.message,'error');
     console.error('Cloud save failed:',e);
   }finally{isSyncing=false}
 }
 
 async function persist(){persistLocal();await persistCloud()}
-async function saveData(){persistLocal();await persistCloud();toast('<svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg> تم الحفظ')}
+async function saveData(){persistLocal();await persistCloud();if(isOnline)toast('<svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg> تم الحفظ والمزامنة')}
+async function manualSync(){
+  showSync('جاري المزامنة...','');
+  await loadFromCloud();
+  render();
+  toast('تم تحديث البيانات');
+}
 function exportData(){const b=new Blob([JSON.stringify({activities:acts,sections,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`activities_${fk(new Date())}.json`;a.click();toast('تم تصدير البيانات')}
 function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{try{const d=JSON.parse(ev.target.result);if(d.activities){acts=d.activities;if(d.sections)sections=d.sections;await persist();render();toast('تم استيراد البيانات')}}catch{toast('خطأ في الملف')}};r.readAsText(f);e.target.value=''}
 
