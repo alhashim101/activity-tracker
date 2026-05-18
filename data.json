@@ -1,148 +1,60 @@
 {
   "activities": [
     {
-      "title": "تسليم الموقف التنفيذي للربع الاول",
-      "description": "",
-      "startDate": "2026-05-18",
-      "deadline": "2026-05-19",
-      "priority": "high",
-      "status": "pending",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "strategic",
-      "id": "vjh9bswvz",
-      "createdAt": "2026-05-18T10:44:40.020Z"
-    },
-    {
-      "title": "مشروع استراتيجية الاستثمار",
-      "description": "",
-      "startDate": "2026-05-18",
-      "deadline": "2026-05-21",
-      "priority": "medium",
-      "status": "in_progress",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "strategic",
-      "id": "kyn2vy6cx",
-      "createdAt": "2026-05-18T10:45:35.906Z",
-      "project": "استراتيجية الاستثمار"
-    },
-    {
-      "title": "توزيع الموازنات مع الانشطة",
-      "description": "",
-      "startDate": "2026-05-18",
-      "deadline": "2026-05-21",
-      "priority": "medium",
-      "status": "in_progress",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "strategic",
-      "id": "mi4rdjong",
-      "createdAt": "2026-05-18T10:46:06.274Z",
-      "project": "الإسكان الاجتماعي"
-    },
-    {
-      "title": "تقرير التحول الرقمي",
-      "description": "",
-      "startDate": "2026-05-18",
-      "deadline": "2026-05-19",
-      "priority": "high",
-      "status": "pending",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "digital",
-      "id": "25pu75l8p",
-      "createdAt": "2026-05-18T10:46:23.610Z"
-    },
-    {
       "title": "جريدة التخطيط",
-      "description": "",
-      "startDate": "2026-05-18",
-      "deadline": "2026-05-25",
-      "priority": "medium",
+      "description": "تصميم جريدة التخطيط",
+      "startDate": "2026-05-14",
+      "deadline": "2026-05-18",
+      "priority": "high",
       "status": "in_progress",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
       "subtasks": [
         {
-          "id": "36va5f19i",
-          "title": "عكس الملاحظات ",
+          "id": "bbq6z08nd",
+          "title": "التأكد من البيانات الموجودة ",
           "completed": false
         },
         {
-          "id": "5wq3vr2bb",
-          "title": "تغيير ثيمة الجريدة ",
+          "id": "cqa17n0jx",
+          "title": "عكس الملاحظات من الاء و ريم ",
           "completed": false
         }
       ],
-      "sectionId": "strategic",
-      "id": "hz0c759ml",
-      "createdAt": "2026-05-18T10:47:20.514Z"
+      "sectionId": "general",
+      "id": "soumi6gua",
+      "createdAt": "2026-05-14T08:07:38.636Z"
     },
     {
-      "title": "مبادرة الاجادة المؤسسية",
-      "description": "",
-      "startDate": "2026-05-20",
-      "deadline": "2026-05-21",
+      "title": "التقرير الشهري مارس",
+      "description": "مراجعة التقرير",
+      "startDate": "2026-05-17",
+      "deadline": "2026-05-17",
       "priority": "medium",
-      "status": "pending",
+      "status": "in_progress",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
       "subtasks": [],
-      "sectionId": "strategic",
-      "id": "o8h695v2r",
-      "createdAt": "2026-05-18T10:47:47.786Z"
+      "sectionId": "general",
+      "id": "f2lppypzt",
+      "createdAt": "2026-05-14T09:35:53.339Z"
     },
     {
-      "title": "ورشة التخطيط الاستراتيجي",
-      "description": "",
+      "title": "الموازنات",
+      "description": "ربط الموازنات معانشطة المشروع",
       "startDate": "2026-05-19",
-      "deadline": "2026-05-19",
-      "priority": "high",
-      "status": "pending",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "strategic",
-      "id": "ztdia7e9p",
-      "createdAt": "2026-05-18T10:48:28.566Z"
-    },
-    {
-      "title": "ROI",
-      "description": "",
-      "startDate": "2026-05-18",
-      "deadline": "2026-05-25",
+      "deadline": "2026-05-17",
       "priority": "medium",
       "status": "pending",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
-      "subtasks": [
-        {
-          "id": "jjgumvrwk",
-          "title": "التواصل مع الشركة ",
-          "completed": false
-        },
-        {
-          "id": "afp54kg1y",
-          "title": "الاجتنماع معهم لتوضيح المتطلبات ",
-          "completed": false
-        }
-      ],
-      "sectionId": "strategic",
-      "id": "pw0l5n5v7",
-      "createdAt": "2026-05-18T10:50:41.034Z"
+      "subtasks": [],
+      "sectionId": "general",
+      "id": "stc6gd5mq",
+      "createdAt": "2026-05-14T09:55:12.947Z"
     }
   ],
   "sections": [
@@ -177,23 +89,5 @@
       "icon": "inbox"
     }
   ],
-  "projects": [
-    "برنامج تطوير منظومة الحماية الاجتماعية",
-    "مزايا (تسهيلات وخدمات للمستفيدين)",
-    "الإسكان الاجتماعي",
-    "التأمين الصحي الاجتماعي",
-    "سجل وطني رقمي موحد لجميع المستفيدين",
-    "تفعيل فرع تأمين الإجازات المرضية والإجازات غير الاعتيادية",
-    "تفعيل نظام الادخار",
-    "تفعيل فرع تأمين إصابات العمل على العاملين غير العمانيين",
-    "سياسة الحماية الاجتماعية",
-    "الدراسة الإكتوارية",
-    "برنامج التحول الرقمي",
-    "استراتيجية الاستثمار",
-    "منظومة آليات التحصيل",
-    "دليل حوكمة أعمال أنشطة الصندوق والمجلس",
-    "الهيكل التنظيمي للصندوق",
-    "استراتيجية رأس المال البشري"
-  ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٣:٠٤:١٣ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦، ٥:٢١:١١ م"
 }
