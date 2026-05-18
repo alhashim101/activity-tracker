@@ -29,6 +29,21 @@
       "sectionId": "strategic",
       "id": "kyn2vy6cx",
       "createdAt": "2026-05-18T10:45:35.906Z"
+    },
+    {
+      "title": "توزيع الموازنات مع الانشطة",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-21",
+      "priority": "medium",
+      "status": "in_progress",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "mi4rdjong",
+      "createdAt": "2026-05-18T10:46:06.274Z"
     }
   ],
   "sections": [
@@ -63,5 +78,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٥:٣٥ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٦:٠٦ م"
 }
