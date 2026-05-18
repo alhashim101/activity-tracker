@@ -115,6 +115,32 @@
       "sectionId": "strategic",
       "id": "ztdia7e9p",
       "createdAt": "2026-05-18T10:48:28.566Z"
+    },
+    {
+      "title": "ROI",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-25",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": "jjgumvrwk",
+          "title": "التواصل مع الشركة ",
+          "completed": false
+        },
+        {
+          "id": "afp54kg1y",
+          "title": "الاجتنماع معهم لتوضيح المتطلبات ",
+          "completed": false
+        }
+      ],
+      "sectionId": "strategic",
+      "id": "pw0l5n5v7",
+      "createdAt": "2026-05-18T10:50:41.034Z"
     }
   ],
   "sections": [
@@ -149,5 +175,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٨:٢٨ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٥٠:٤١ م"
 }
