@@ -184,6 +184,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
 .task-desc{font-size:13px;color:var(--text-secondary);margin-bottom:10px;line-height:1.7}
 .task-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--text-secondary)}
 .task-meta-item{display:inline-flex;align-items:center;gap:4px}
+.task-project{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--primary-mid);background:var(--primary-surface);padding:5px 12px;border-radius:8px;margin-bottom:8px;border:1px solid var(--primary-light)}
 .status-badge{cursor:pointer;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid transparent;transition:all var(--tr-fast);font-family:var(--font-body);min-height:28px;display:inline-flex;align-items:center;gap:4px}
 .status-badge:hover{filter:brightness(0.92)}
 .priority-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center}
@@ -300,6 +301,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
     <select class="filter-select" id="filterStatus" onchange="render()"><option value="all">كل الحالات</option><option value="pending">قيد الانتظار</option><option value="in_progress">قيد التنفيذ</option><option value="completed">مكتمل</option><option value="delayed">متأخر</option></select>
     <select class="filter-select" id="filterPriority" onchange="render()"><option value="all">كل الأولويات</option><option value="high">عالي</option><option value="medium">متوسط</option><option value="low">منخفض</option></select>
     <select class="filter-select" id="filterSection" onchange="render()"><option value="all">كل الأقسام</option></select>
+    <select class="filter-select" id="filterProject" onchange="render()"><option value="all">كل المشاريع</option></select>
   </div>
   <div id="content"></div>
   <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeForm()"><div class="modal" id="modal" role="dialog"></div></div>
@@ -336,6 +338,25 @@ const DEFAULT_SECTIONS=[
   {id:'general',name:'مهام عامة',colorId:'slate',icon:'inbox'},
 ];
 
+const DEFAULT_PROJECTS=[
+  'برنامج تطوير منظومة الحماية الاجتماعية',
+  'مزايا (تسهيلات وخدمات للمستفيدين)',
+  'الإسكان الاجتماعي',
+  'التأمين الصحي الاجتماعي',
+  'سجل وطني رقمي موحد لجميع المستفيدين',
+  'تفعيل فرع تأمين الإجازات المرضية والإجازات غير الاعتيادية',
+  'تفعيل نظام الادخار',
+  'تفعيل فرع تأمين إصابات العمل على العاملين غير العمانيين',
+  'سياسة الحماية الاجتماعية',
+  'الدراسة الإكتوارية',
+  'برنامج التحول الرقمي',
+  'استراتيجية الاستثمار',
+  'منظومة آليات التحصيل',
+  'دليل حوكمة أعمال أنشطة الصندوق والمجلس',
+  'الهيكل التنظيمي للصندوق',
+  'استراتيجية رأس المال البشري',
+];
+
 const SEC_ICONS={
   target:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
   cpu:'<svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
@@ -359,7 +380,7 @@ const CAT_ICONS={
   other:'<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
 };
 
-let acts=[],sections=[],selDate=new Date(),curM=new Date().getMonth(),curY=new Date().getFullYear();
+let acts=[],sections=[],projects=[],selDate=new Date(),curM=new Date().getMonth(),curY=new Date().getFullYear();
 let curView='calendar',editId=null,expanded={},collapsedSections={},lastSave='',formSubs=[];
 const GH_OWNER='alhashim101',GH_REPO='activity-tracker',GH_FILE='data.json';
 let GH_TOKEN=localStorage.getItem('gh_token')||'';
@@ -404,7 +425,7 @@ async function connectAPI(){
       const text=decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
       const d=JSON.parse(text);
       if(d&&d.activities){
-        acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
+        acts=d.activities;sections=d.sections||sections;projects=d.projects||projects;lastSave=d.lastSaved||'';
         localStorage.setItem(SK,JSON.stringify(d));
       }
       document.getElementById('setupBanner').style.display='none';
@@ -415,7 +436,7 @@ async function connectAPI(){
     }else if(fileR.status===404){
       // File doesn't exist — create it with current data
       showSync('جاري إنشاء قاعدة البيانات...','');
-      const initData={activities:acts,sections:sections,lastSaved:new Date().toLocaleString('ar-OM')};
+      const initData={activities:acts,sections:sections,projects:projects,lastSaved:new Date().toLocaleString('ar-OM')};
       const content=btoa(unescape(encodeURIComponent(JSON.stringify(initData,null,2))));
       const wr=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
         method:'PUT',
@@ -443,9 +464,11 @@ function skipSetup(){document.getElementById('setupBanner').style.display='none'
 
 async function load(){
   sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
-  try{const s=localStorage.getItem(SK);if(s){const d=JSON.parse(s);acts=d.activities||[];sections=d.sections||DEFAULT_SECTIONS;lastSave=d.lastSaved||''}}catch(e){}
+  projects=JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+  try{const s=localStorage.getItem(SK);if(s){const d=JSON.parse(s);acts=d.activities||[];sections=d.sections||DEFAULT_SECTIONS;projects=d.projects||DEFAULT_PROJECTS;lastSave=d.lastSaved||''}}catch(e){}
   if(!acts.length){try{const old=localStorage.getItem('spf_activity_tracker_v4');if(old){const d=JSON.parse(old);if(d.activities?.length){acts=d.activities.map(a=>({...a,sectionId:a.sectionId||'general'}));sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));lastSave=d.lastSaved||''}}}catch(e){}}
   if(!sections.length)sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
+  if(!projects.length)projects=JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
   render();
   if(!GH_TOKEN){
     if(!localStorage.getItem('tracker_setup_skipped'))document.getElementById('setupBanner').style.display='block';
@@ -473,7 +496,7 @@ async function loadFromCloud(){
     // Decode base64 content (handle Arabic/UTF-8)
     const text=decodeURIComponent(escape(atob(file.content.replace(/\n/g,''))));
     const d=JSON.parse(text);
-    if(d&&d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
+    if(d&&d.activities){acts=d.activities;sections=d.sections||sections;projects=d.projects||projects;lastSave=d.lastSaved||'';
       localStorage.setItem(SK,JSON.stringify(d));
       render();showSync('تم المزامنة','success');isOnline=true}
     else showSync('تم الاتصال','success');
@@ -485,7 +508,7 @@ async function loadFromCloud(){
 }
 
 function persistLocal(){
-  const d={activities:acts,sections,lastSaved:new Date().toLocaleString('ar-OM')};
+  const d={activities:acts,sections,projects,lastSaved:new Date().toLocaleString('ar-OM')};
   lastSave=d.lastSaved;localStorage.setItem(SK,JSON.stringify(d));
   document.getElementById('lastSaved').textContent='آخر حفظ: '+lastSave;
 }
@@ -504,7 +527,7 @@ async function persistCloud(){
       if(chk.ok){const f=await chk.json();GH_SHA=f.sha}
     }catch(e){}
     
-    const jsonStr=JSON.stringify({activities:acts,sections,lastSaved:lastSave},null,2);
+    const jsonStr=JSON.stringify({activities:acts,sections,projects,lastSaved:lastSave},null,2);
     const content=btoa(unescape(encodeURIComponent(jsonStr)));
     const body={message:'Update tracker data',content:content};
     if(GH_SHA)body.sha=GH_SHA;
@@ -531,22 +554,27 @@ async function manualSync(){
   render();
   toast('تم تحديث البيانات');
 }
-function exportData(){const b=new Blob([JSON.stringify({activities:acts,sections,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`activities_${fk(new Date())}.json`;a.click();toast('تم تصدير البيانات')}
-function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{try{const d=JSON.parse(ev.target.result);if(d.activities){acts=d.activities;if(d.sections)sections=d.sections;await persist();render();toast('تم استيراد البيانات')}}catch{toast('خطأ في الملف')}};r.readAsText(f);e.target.value=''}
+function exportData(){const b=new Blob([JSON.stringify({activities:acts,sections,projects,exportDate:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`activities_${fk(new Date())}.json`;a.click();toast('تم تصدير البيانات')}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async ev=>{try{const d=JSON.parse(ev.target.result);if(d.activities){acts=d.activities;if(d.sections)sections=d.sections;if(d.projects)projects=d.projects;await persist();render();toast('تم استيراد البيانات')}}catch{toast('خطأ في الملف')}};r.readAsText(f);e.target.value=''}
 
 function updateSectionFilter(){
   const sel=document.getElementById('filterSection');
   const cur=sel.value;
   sel.innerHTML='<option value="all">كل الأقسام</option>'+sections.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
   sel.value=cur;
+  const psel=document.getElementById('filterProject');
+  const pcur=psel.value;
+  psel.innerHTML='<option value="all">كل المشاريع</option>'+projects.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  psel.value=pcur;
 }
 
 function switchView(v,btn){curView=v;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(btn)btn.classList.add('active');render()}
 function getFiltered(){
-  const q=document.getElementById('searchInput').value,fs=document.getElementById('filterStatus').value,fp=document.getElementById('filterPriority').value,fsc=document.getElementById('filterSection').value;
+  const q=document.getElementById('searchInput').value,fs=document.getElementById('filterStatus').value,fp=document.getElementById('filterPriority').value,fsc=document.getElementById('filterSection').value,fpr=document.getElementById('filterProject').value;
   return acts.filter(a=>{
     if(fs!=='all'&&a.status!==fs)return false;if(fp!=='all'&&a.priority!==fp)return false;
     if(fsc!=='all'&&a.sectionId!==fsc)return false;
+    if(fpr!=='all'&&a.project!==fpr)return false;
     if(q&&!a.title.includes(q)&&!(a.description||'').includes(q))return false;return true;
   });
 }
@@ -579,6 +607,7 @@ function taskCard(a,showSectionTag){
     <div class="task-top"><div class="task-info">
       <div class="task-title-row"><div class="task-cat-icon ${a.category||'other'}">${catIcon}</div><span class="task-title">${esc(a.title)}</span>${secTag}${ov?'<span class="overdue-badge"><svg class="icon" style="width:12px;height:12px" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> متأخر</span>':''}</div>
       ${a.description?`<div class="task-desc">${esc(a.description)}</div>`:''}
+      ${a.project?`<div class="task-project"><svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> ${esc(a.project)}</div>`:''}
       <div class="task-meta"><span class="task-meta-item"><svg class="icon icon-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${fd(a.startDate)} → ${fd(a.deadline)}</span>
         ${a.estimatedHours?`<span class="task-meta-item"><svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${a.estimatedHours} ساعة</span>`:''}
         <button class="status-badge" onclick="toggleStatus('${a.id}')" style="background:${st.c}14;color:${st.c};border-color:${st.c}40">${st.l}</button>
@@ -699,6 +728,8 @@ function renderForm(a){
     <div class="modal-header"><h2>${editId?'تعديل النشاط':'نشاط جديد'}</h2><button class="modal-close" onclick="closeForm()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-grid">
       <div class="form-group full"><label class="form-label">القسم</label><div class="section-chips" id="secChips">${secChips}</div></div>
+      <div class="form-group full"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><label class="form-label" style="margin:0">المشروع</label><button class="btn btn-outline btn-sm" onclick="addProjectPrompt()"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> مشروع جديد</button></div>
+        <select class="form-select-field" id="f_proj"><option value="">— بدون مشروع —</option>${projects.map(p=>`<option value="${esc(p)}" ${a?.project===p?'selected':''}>${esc(p)}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">العنوان *</label><input class="form-input" id="f_t" value="${esc(a?.title||'')}" placeholder="عنوان النشاط"></div>
       <div class="form-group"><label class="form-label">التصنيف</label><select class="form-select-field" id="f_cat">${CATS.map(c=>`<option value="${c.v}" ${(a?.category||'other')===c.v?'selected':''}>${c.l}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">تاريخ البدء</label><input class="form-input" type="date" id="f_s" value="${a?.startDate||td}"></div>
@@ -723,6 +754,26 @@ function setFormSection(el,id){
   const sec=sections.find(s=>s.id===id);if(sec){const sc=getSC(sec.colorId);el.style.borderColor=sc.c;el.style.background=sc.light}
 }
 
+function addProjectPrompt(){
+  const name=prompt('اسم المشروع الجديد:');
+  if(name&&name.trim()){
+    const trimmed=name.trim();
+    if(!projects.includes(trimmed)){
+      projects.push(trimmed);
+      persistLocal();persistCloud();
+      // Refresh the dropdown
+      const sel=document.getElementById('f_proj');
+      const opt=document.createElement('option');
+      opt.value=trimmed;opt.textContent=trimmed;opt.selected=true;
+      sel.appendChild(opt);
+      toast('تم إضافة المشروع');
+    }else{
+      document.getElementById('f_proj').value=trimmed;
+      toast('المشروع موجود مسبقاً');
+    }
+  }
+}
+
 function renderFS(){return formSubs.map((s,i)=>`<div class="subtask-form-row"><span class="num">${i+1}.</span><input class="form-input" style="margin:0" value="${esc(s.title)}" placeholder="عنوان المهمة الفرعية" onchange="upFS('${s.id}',this.value)"><button class="subtask-remove" onclick="rmFS('${s.id}')"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join('')}
 function addFS(){formSubs.push({id:gid(),title:'',completed:false});document.getElementById('fsl').innerHTML=renderFS();const ins=document.getElementById('fsl').querySelectorAll('input');if(ins.length)ins[ins.length-1].focus()}
 function upFS(id,v){const s=formSubs.find(x=>x.id===id);if(s)s.title=v}
@@ -732,7 +783,7 @@ function setSt(btn,v){document.getElementById('modal').dataset.status=v;const s=
 
 function submit(){
   const title=document.getElementById('f_t').value.trim();if(!title){toast('يرجى إدخال عنوان النشاط');return}
-  const data={title,description:document.getElementById('f_d').value.trim(),startDate:document.getElementById('f_s').value,deadline:document.getElementById('f_dl').value,priority:document.getElementById('modal').dataset.priority,status:document.getElementById('modal').dataset.status,category:document.getElementById('f_cat').value,estimatedHours:document.getElementById('f_h').value,notes:document.getElementById('f_n').value.trim(),subtasks:formSubs.filter(s=>s.title.trim()),sectionId:document.getElementById('modal').dataset.section};
+  const data={title,description:document.getElementById('f_d').value.trim(),startDate:document.getElementById('f_s').value,deadline:document.getElementById('f_dl').value,priority:document.getElementById('modal').dataset.priority,status:document.getElementById('modal').dataset.status,category:document.getElementById('f_cat').value,estimatedHours:document.getElementById('f_h').value,notes:document.getElementById('f_n').value.trim(),subtasks:formSubs.filter(s=>s.title.trim()),sectionId:document.getElementById('modal').dataset.section,project:document.getElementById('f_proj').value};
   if(editId){const i=acts.findIndex(a=>a.id===editId);if(i>=0)acts[i]={...acts[i],...data};toast('تم تحديث النشاط')}
   else{acts.push({...data,id:gid(),createdAt:new Date().toISOString()});toast('تم إضافة النشاط')}
   persistLocal();closeForm();render();persistCloud();
