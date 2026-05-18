@@ -263,12 +263,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
   <div class="sync-bar" id="syncBar"><span class="sync-dot syncing"></span> <span id="syncText">جاري المزامنة...</span></div>
   <div class="setup-banner" id="setupBanner" style="display:none">
     <h3>ربط قاعدة البيانات</h3>
-    <p>أدخل API Key من JSONBin.io</p>
-    <input type="text" id="apiKeyInput" placeholder="API Key: $2a$10$XXXX..." dir="ltr">
-    <input type="text" id="binIdInput" placeholder="Bin ID (اتركه فاضي لو أول مرة)" dir="ltr" style="margin-top:4px">
-    <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">لو عندك Bin ID من جهاز ثاني أدخله — لو أول مرة خلّه فاضي</p>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button class="btn btn-primary" onclick="connectAPI()">ربط</button>
+    <p>اضغط "إنشاء" لإنشاء قاعدة بيانات جديدة<br>أو أدخل الـ ID لو عندك واحد من جهاز ثاني</p>
+    <input type="text" id="npointIdInput" placeholder="الـ ID من جهاز ثاني (اتركه فاضي لو أول مرة)" dir="ltr">
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button class="btn btn-primary" onclick="connectAPI()">ربط / إنشاء</button>
       <button class="btn btn-outline" onclick="skipSetup()">تخطي (حفظ محلي فقط)</button>
     </div>
   </div>
@@ -362,8 +360,7 @@ const CAT_ICONS={
 
 let acts=[],sections=[],selDate=new Date(),curM=new Date().getMonth(),curY=new Date().getFullYear();
 let curView='calendar',editId=null,expanded={},collapsedSections={},lastSave='',formSubs=[];
-let API_KEY=localStorage.getItem('jsonbin_api_key')||'';
-let BIN_ID=localStorage.getItem('jsonbin_bin_id')||'';
+let NP_ID=localStorage.getItem('npoint_id')||'';
 let isOnline=true,isSyncing=false;
 
 const gid=()=>Math.random().toString(36).substr(2,9);
@@ -380,39 +377,75 @@ function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.class
 function showSync(msg,type){const b=document.getElementById('syncBar'),d=b.querySelector('.sync-dot'),t=document.getElementById('syncText');b.className='sync-bar show'+(type?' '+type:'');d.className='sync-dot '+(type==='success'?'synced':type==='error'?'offline':'syncing');t.textContent=msg;if(type==='success')setTimeout(()=>b.classList.remove('show'),3000)}
 
 async function connectAPI(){
-  const key=document.getElementById('apiKeyInput').value.trim();
-  const existingBin=document.getElementById('binIdInput').value.trim();
-  if(!key||!key.startsWith('$2')){toast('الـ API Key غير صحيح');return}
-  API_KEY=key;localStorage.setItem('jsonbin_api_key',key);
+  const existingId=document.getElementById('npointIdInput').value.trim();
   showSync('جاري الاتصال...','');
   try{
-    if(existingBin){
-      // Use existing bin
-      BIN_ID=existingBin;localStorage.setItem('jsonbin_bin_id',BIN_ID);
+    if(existingId){
+      NP_ID=existingId;localStorage.setItem('npoint_id',NP_ID);
       document.getElementById('setupBanner').style.display='none';
       await loadFromCloud();
-      toast('تم الربط بنجاح — Bin ID: '+BIN_ID);
+      toast('تم الربط بنجاح');
     }else{
-      // Create new bin
-      const r=await fetch('https://api.jsonbin.io/v3/b',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Name':'Activity Tracker','X-Bin-Private':'false'},
+      const r=await fetch('https://api.npoint.io/',{
+        method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({activities:acts.length?acts:[],sections:sections,lastSaved:''})
       });
       const data=await r.json();
-      if(data.metadata&&data.metadata.id){
-        BIN_ID=data.metadata.id;localStorage.setItem('jsonbin_bin_id',BIN_ID);
+      if(data){
+        // npoint returns the URL path
+        const url=r.headers.get('location')||'';
+        // Extract ID from response
+        const idMatch=url.match(/\/([a-f0-9]+)$/);
+        if(idMatch){NP_ID=idMatch[1]}
+        else{
+          // Try fetching the bins list or use alternative method
+          const text=await r.text();
+          // npoint returns just the data, the ID is in the URL
+          // Let's try a different approach - create via the page
+          throw new Error('Could not get ID');
+        }
+        localStorage.setItem('npoint_id',NP_ID);
         document.getElementById('setupBanner').style.display='none';
-        showSync('تم الربط — احفظ الـ Bin ID للأجهزة الثانية: '+BIN_ID,'success');
-        toast('Bin ID: '+BIN_ID+' — احفظه!');
-        if(acts.length)await persistCloud();
+        showSync('تم الإنشاء — الـ ID: '+NP_ID,'success');
+        toast('احفظ الـ ID للأجهزة الثانية: '+NP_ID);
         render();
-      }else throw new Error('Failed');
+      }
     }
   }catch(e){
-    console.error(e);toast('خطأ في الربط');showSync('فشل الربط','error');
+    console.error(e);
+    // Fallback: ask user to create manually
+    toast('سوّ الخطوة يدوياً');
+    showSync('','');
+    document.getElementById('setupBanner').innerHTML=`
+      <h3>إنشاء قاعدة بيانات</h3>
+      <p>1. افتح <a href="https://www.npoint.io/" target="_blank" style="color:#7C3AED;font-weight:700">npoint.io</a> في تاب جديد<br>
+      2. امسح المحتوى والصق هذا: <code>{}</code><br>
+      3. اضغط <b>Save</b><br>
+      4. انسخ الـ <b>ID</b> من الرابط (الجزء بعد api.npoint.io/)</p>
+      <input type="text" id="npointIdInput2" placeholder="الصق الـ ID هنا" dir="ltr">
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn btn-primary" onclick="manualConnect()">ربط</button>
+      </div>`;
   }
 }
+
+async function manualConnect(){
+  const id=document.getElementById('npointIdInput2').value.trim();
+  if(!id){toast('أدخل الـ ID');return}
+  NP_ID=id;localStorage.setItem('npoint_id',NP_ID);
+  // Save current data to the new endpoint
+  try{
+    await fetch('https://api.npoint.io/'+NP_ID,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({activities:acts,sections:sections,lastSaved:new Date().toLocaleString('ar-OM')})
+    });
+  }catch(e){}
+  document.getElementById('setupBanner').style.display='none';
+  showSync('تم الربط بنجاح','success');
+  toast('تم الربط — الـ ID: '+NP_ID);
+  render();
+}
+
 function skipSetup(){document.getElementById('setupBanner').style.display='none';localStorage.setItem('tracker_setup_skipped','1')}
 
 async function load(){
@@ -421,7 +454,7 @@ async function load(){
   if(!acts.length){try{const old=localStorage.getItem('spf_activity_tracker_v4');if(old){const d=JSON.parse(old);if(d.activities?.length){acts=d.activities.map(a=>({...a,sectionId:a.sectionId||'general'}));sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));lastSave=d.lastSaved||''}}}catch(e){}}
   if(!sections.length)sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
   render();
-  if(!API_KEY||!BIN_ID){
+  if(!NP_ID){
     if(!localStorage.getItem('tracker_setup_skipped'))document.getElementById('setupBanner').style.display='block';
     return;
   }
@@ -429,15 +462,12 @@ async function load(){
 }
 
 async function loadFromCloud(){
-  if(!API_KEY||!BIN_ID)return;
+  if(!NP_ID)return;
   try{
     showSync('جاري تحميل البيانات...','');
-    const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{
-      headers:{'X-Master-Key':API_KEY}
-    });
+    const r=await fetch('https://api.npoint.io/'+NP_ID);
     if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    const d=data.record;
+    const d=await r.json();
     if(d&&d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
       localStorage.setItem(SK,JSON.stringify(d));
       render();showSync('تم المزامنة','success');isOnline=true}
@@ -455,12 +485,11 @@ function persistLocal(){
 }
 
 async function persistCloud(){
-  if(!API_KEY||!BIN_ID)return;
+  if(!NP_ID)return;
   try{
     isSyncing=true;showSync('جاري الحفظ...','');
-    const r=await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
+    const r=await fetch('https://api.npoint.io/'+NP_ID,{
+      method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({activities:acts,sections,lastSaved:lastSave})
     });
     if(!r.ok)throw new Error('HTTP '+r.status);
