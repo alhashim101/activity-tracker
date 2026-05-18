@@ -59,6 +59,21 @@
       "sectionId": "strategic",
       "id": "irkmb2vnc",
       "createdAt": "2026-05-18T04:56:06.217Z"
+    },
+    {
+      "title": "عرض البرنامج التدريبي",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-20",
+      "priority": "medium",
+      "status": "in_progress",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "25u48i8tv",
+      "createdAt": "2026-05-18T04:56:33.412Z"
     }
   ],
   "sections": [
@@ -93,5 +108,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٦:٠٦ ص"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٦:٣٣ ص"
 }
