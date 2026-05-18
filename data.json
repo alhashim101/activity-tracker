@@ -44,6 +44,21 @@
       "sectionId": "strategic",
       "id": "3u5unofcl",
       "createdAt": "2026-05-18T04:55:44.579Z"
+    },
+    {
+      "title": "جريدة التخطيط",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-21",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "irkmb2vnc",
+      "createdAt": "2026-05-18T04:56:06.217Z"
     }
   ],
   "sections": [
@@ -78,5 +93,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٥:٤٤ ص"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٦:٠٦ ص"
 }
