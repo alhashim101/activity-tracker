@@ -263,10 +263,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
   <div class="sync-bar" id="syncBar"><span class="sync-dot syncing"></span> <span id="syncText">جاري المزامنة...</span></div>
   <div class="setup-banner" id="setupBanner" style="display:none">
     <h3>ربط قاعدة البيانات</h3>
-    <p>اضغط "إنشاء" لإنشاء قاعدة بيانات جديدة<br>أو أدخل الـ ID لو عندك واحد من جهاز ثاني</p>
-    <input type="text" id="npointIdInput" placeholder="الـ ID من جهاز ثاني (اتركه فاضي لو أول مرة)" dir="ltr">
+    <p>أدخل GitHub Personal Access Token<br>سوّه من <a href="https://github.com/settings/tokens" target="_blank" style="color:#7C3AED;font-weight:700">github.com/settings/tokens</a></p>
+    <input type="password" id="ghTokenInput" placeholder="ghp_XXXXXXXXXXXX..." dir="ltr">
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn btn-primary" onclick="connectAPI()">ربط / إنشاء</button>
+      <button class="btn btn-primary" onclick="connectAPI()">ربط</button>
       <button class="btn btn-outline" onclick="skipSetup()">تخطي (حفظ محلي فقط)</button>
     </div>
   </div>
@@ -360,7 +360,9 @@ const CAT_ICONS={
 
 let acts=[],sections=[],selDate=new Date(),curM=new Date().getMonth(),curY=new Date().getFullYear();
 let curView='calendar',editId=null,expanded={},collapsedSections={},lastSave='',formSubs=[];
-let NP_ID=localStorage.getItem('npoint_id')||'';
+const GH_OWNER='alhashim101',GH_REPO='activity-tracker',GH_FILE='data.json';
+let GH_TOKEN=localStorage.getItem('gh_token')||'';
+let GH_SHA='';
 let isOnline=true,isSyncing=false;
 
 const gid=()=>Math.random().toString(36).substr(2,9);
@@ -377,75 +379,27 @@ function toast(m){const t=document.getElementById('toast');t.innerHTML=m;t.class
 function showSync(msg,type){const b=document.getElementById('syncBar'),d=b.querySelector('.sync-dot'),t=document.getElementById('syncText');b.className='sync-bar show'+(type?' '+type:'');d.className='sync-dot '+(type==='success'?'synced':type==='error'?'offline':'syncing');t.textContent=msg;if(type==='success')setTimeout(()=>b.classList.remove('show'),3000)}
 
 async function connectAPI(){
-  const existingId=document.getElementById('npointIdInput').value.trim();
-  showSync('جاري الاتصال...','');
+  const token=document.getElementById('ghTokenInput').value.trim();
+  if(!token||!token.startsWith('ghp_')){toast('التوكن غير صحيح — لازم يبدأ بـ ghp_');return}
+  GH_TOKEN=token;localStorage.setItem('gh_token',token);
+  showSync('جاري التحقق...','');
   try{
-    if(existingId){
-      NP_ID=existingId;localStorage.setItem('npoint_id',NP_ID);
-      document.getElementById('setupBanner').style.display='none';
-      await loadFromCloud();
-      toast('تم الربط بنجاح');
-    }else{
-      const r=await fetch('https://api.npoint.io/',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({activities:acts.length?acts:[],sections:sections,lastSaved:''})
-      });
-      const data=await r.json();
-      if(data){
-        // npoint returns the URL path
-        const url=r.headers.get('location')||'';
-        // Extract ID from response
-        const idMatch=url.match(/\/([a-f0-9]+)$/);
-        if(idMatch){NP_ID=idMatch[1]}
-        else{
-          // Try fetching the bins list or use alternative method
-          const text=await r.text();
-          // npoint returns just the data, the ID is in the URL
-          // Let's try a different approach - create via the page
-          throw new Error('Could not get ID');
-        }
-        localStorage.setItem('npoint_id',NP_ID);
-        document.getElementById('setupBanner').style.display='none';
-        showSync('تم الإنشاء — الـ ID: '+NP_ID,'success');
-        toast('احفظ الـ ID للأجهزة الثانية: '+NP_ID);
-        render();
-      }
-    }
+    // Test token by fetching repo info
+    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO,{
+      headers:{'Authorization':'Bearer '+GH_TOKEN}
+    });
+    if(!r.ok)throw new Error('Token invalid or no access');
+    document.getElementById('setupBanner').style.display='none';
+    showSync('تم الربط بنجاح','success');
+    // Try to load existing data or create new
+    await loadFromCloud();
+    if(acts.length)await persistCloud();
+    toast('تم الربط — البيانات تتزامن تلقائياً');
   }catch(e){
-    console.error(e);
-    // Fallback: ask user to create manually
-    toast('سوّ الخطوة يدوياً');
-    showSync('','');
-    document.getElementById('setupBanner').innerHTML=`
-      <h3>إنشاء قاعدة بيانات</h3>
-      <p>1. افتح <a href="https://www.npoint.io/" target="_blank" style="color:#7C3AED;font-weight:700">npoint.io</a> في تاب جديد<br>
-      2. امسح المحتوى والصق هذا: <code>{}</code><br>
-      3. اضغط <b>Save</b><br>
-      4. انسخ الـ <b>ID</b> من الرابط (الجزء بعد api.npoint.io/)</p>
-      <input type="text" id="npointIdInput2" placeholder="الصق الـ ID هنا" dir="ltr">
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-        <button class="btn btn-primary" onclick="manualConnect()">ربط</button>
-      </div>`;
+    console.error(e);toast('خطأ — تأكد من التوكن والصلاحيات');
+    showSync('فشل الربط','error');
   }
 }
-
-async function manualConnect(){
-  const id=document.getElementById('npointIdInput2').value.trim();
-  if(!id){toast('أدخل الـ ID');return}
-  NP_ID=id;localStorage.setItem('npoint_id',NP_ID);
-  // Save current data to the new endpoint
-  try{
-    await fetch('https://api.npoint.io/'+NP_ID,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({activities:acts,sections:sections,lastSaved:new Date().toLocaleString('ar-OM')})
-    });
-  }catch(e){}
-  document.getElementById('setupBanner').style.display='none';
-  showSync('تم الربط بنجاح','success');
-  toast('تم الربط — الـ ID: '+NP_ID);
-  render();
-}
-
 function skipSetup(){document.getElementById('setupBanner').style.display='none';localStorage.setItem('tracker_setup_skipped','1')}
 
 async function load(){
@@ -454,7 +408,7 @@ async function load(){
   if(!acts.length){try{const old=localStorage.getItem('spf_activity_tracker_v4');if(old){const d=JSON.parse(old);if(d.activities?.length){acts=d.activities.map(a=>({...a,sectionId:a.sectionId||'general'}));sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));lastSave=d.lastSaved||''}}}catch(e){}}
   if(!sections.length)sections=JSON.parse(JSON.stringify(DEFAULT_SECTIONS));
   render();
-  if(!NP_ID){
+  if(!GH_TOKEN){
     if(!localStorage.getItem('tracker_setup_skipped'))document.getElementById('setupBanner').style.display='block';
     return;
   }
@@ -462,12 +416,24 @@ async function load(){
 }
 
 async function loadFromCloud(){
-  if(!NP_ID)return;
+  if(!GH_TOKEN)return;
   try{
     showSync('جاري تحميل البيانات...','');
-    const r=await fetch('https://api.npoint.io/'+NP_ID);
+    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+      headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'},
+      cache:'no-store'
+    });
+    if(r.status===404){
+      // File doesn't exist yet — that's okay
+      showSync('تم الاتصال — قاعدة بيانات جديدة','success');isOnline=true;
+      GH_SHA='';return;
+    }
     if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json();
+    const file=await r.json();
+    GH_SHA=file.sha;
+    // Decode base64 content (handle Arabic/UTF-8)
+    const text=decodeURIComponent(escape(atob(file.content.replace(/\n/g,''))));
+    const d=JSON.parse(text);
     if(d&&d.activities){acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
       localStorage.setItem(SK,JSON.stringify(d));
       render();showSync('تم المزامنة','success');isOnline=true}
@@ -485,16 +451,30 @@ function persistLocal(){
 }
 
 async function persistCloud(){
-  if(!NP_ID)return;
+  if(!GH_TOKEN)return;
   try{
     isSyncing=true;showSync('جاري الحفظ...','');
-    const r=await fetch('https://api.npoint.io/'+NP_ID,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({activities:acts,sections,lastSaved:lastSave})
+    const jsonStr=JSON.stringify({activities:acts,sections,lastSaved:lastSave},null,2);
+    // Encode to base64 (handle Arabic/UTF-8)
+    const content=btoa(unescape(encodeURIComponent(jsonStr)));
+    const body={message:'Update tracker data',content:content};
+    if(GH_SHA)body.sha=GH_SHA;
+    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      body:JSON.stringify(body)
     });
-    if(!r.ok)throw new Error('HTTP '+r.status);
+    if(!r.ok){const err=await r.json();throw new Error(err.message||'HTTP '+r.status)}
+    const data=await r.json();
+    GH_SHA=data.content.sha;
     showSync('تم الحفظ والمزامنة','success');isOnline=true;
   }catch(e){
+    // If conflict (sha mismatch), reload and retry
+    if(e.message&&e.message.includes('does not match')){
+      showSync('جاري إعادة المزامنة...','');
+      await loadFromCloud();
+      return persistCloud();
+    }
     isOnline=false;showSync('تعذر المزامنة — محفوظ محلياً','error');
     console.error('Cloud save failed:',e);
   }finally{isSyncing=false}
