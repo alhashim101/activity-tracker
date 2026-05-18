@@ -1,5 +1,21 @@
 {
-  "activities": [],
+  "activities": [
+    {
+      "title": "تسليم الموقف التنفيذي للربع الاول",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-19",
+      "priority": "high",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "vjh9bswvz",
+      "createdAt": "2026-05-18T10:44:40.020Z"
+    }
+  ],
   "sections": [
     {
       "id": "strategic",
@@ -32,5 +48,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ١٢:٢٢:٢١ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٤:٤٠ م"
 }
