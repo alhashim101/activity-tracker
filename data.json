@@ -100,6 +100,21 @@
       "sectionId": "strategic",
       "id": "o8h695v2r",
       "createdAt": "2026-05-18T10:47:47.786Z"
+    },
+    {
+      "title": "ورشة التخطيط الاستراتيجي",
+      "description": "",
+      "startDate": "2026-05-19",
+      "deadline": "2026-05-19",
+      "priority": "high",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "ztdia7e9p",
+      "createdAt": "2026-05-18T10:48:28.566Z"
     }
   ],
   "sections": [
@@ -134,5 +149,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٧:٤٧ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٨:٢٨ م"
 }
