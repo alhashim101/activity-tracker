@@ -364,7 +364,7 @@ let curView='calendar',editId=null,expanded={},collapsedSections={},lastSave='',
 const GH_OWNER='alhashim101',GH_REPO='activity-tracker',GH_FILE='data.json';
 let GH_TOKEN=localStorage.getItem('gh_token')||'';
 let GH_SHA='';
-let isOnline=true,isSyncing=false;
+let isOnline=true,isSyncing=false,cloudLoaded=false;
 
 const gid=()=>Math.random().toString(36).substr(2,9);
 const fk=d=>{const t=new Date(d);return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`};
@@ -389,37 +389,50 @@ async function connectAPI(){
     const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO,{
       headers:{'Authorization':'Bearer '+GH_TOKEN}
     });
-    if(!r.ok){const err=await r.json();throw new Error('قراءة: '+( err.message||r.status))}
+    if(!r.ok){const err=await r.json();throw new Error('قراءة: '+(err.message||r.status))}
     
-    // Step 2: Test write access by creating/updating data.json
-    showSync('جاري اختبار الكتابة...','');
-    const initData={activities:acts.length?acts:[],sections:sections,lastSaved:new Date().toLocaleString('ar-OM')};
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify(initData,null,2))));
-    
-    // Check if data.json exists
-    let sha='';
-    try{
-      const fileR=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
-        headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}
-      });
-      if(fileR.ok){const f=await fileR.json();sha=f.sha}
-    }catch(e){}
-    
-    const writeBody={message:'Init tracker data',content:content};
-    if(sha)writeBody.sha=sha;
-    const wr=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
-      method:'PUT',
-      headers:{'Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-      body:JSON.stringify(writeBody)
+    // Step 2: Check if data.json exists
+    showSync('جاري تحميل البيانات...','');
+    const fileR=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+      headers:{'Authorization':'Bearer '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'},cache:'no-store'
     });
-    if(!wr.ok){const err=await wr.json();throw new Error('كتابة: '+(err.message||wr.status))}
-    const wrData=await wr.json();
-    GH_SHA=wrData.content.sha;
     
-    document.getElementById('setupBanner').style.display='none';
-    showSync('تم الربط — القراءة والكتابة شغالة','success');
-    toast('تم الربط بنجاح');
-    render();
+    if(fileR.ok){
+      // File exists — LOAD existing data (don't overwrite!)
+      const f=await fileR.json();
+      GH_SHA=f.sha;
+      const text=decodeURIComponent(escape(atob(f.content.replace(/\n/g,''))));
+      const d=JSON.parse(text);
+      if(d&&d.activities){
+        acts=d.activities;sections=d.sections||sections;lastSave=d.lastSaved||'';
+        localStorage.setItem(SK,JSON.stringify(d));
+      }
+      document.getElementById('setupBanner').style.display='none';
+      showSync('تم الربط — تم تحميل البيانات','success');
+      toast('تم الربط بنجاح');
+      cloudLoaded=true;
+      render();
+    }else if(fileR.status===404){
+      // File doesn't exist — create it with current data
+      showSync('جاري إنشاء قاعدة البيانات...','');
+      const initData={activities:acts,sections:sections,lastSaved:new Date().toLocaleString('ar-OM')};
+      const content=btoa(unescape(encodeURIComponent(JSON.stringify(initData,null,2))));
+      const wr=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE,{
+        method:'PUT',
+        headers:{'Authorization':'Bearer '+GH_TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        body:JSON.stringify({message:'Init tracker data',content:content})
+      });
+      if(!wr.ok){const err=await wr.json();throw new Error('كتابة: '+(err.message||wr.status))}
+      const wrData=await wr.json();
+      GH_SHA=wrData.content.sha;
+      document.getElementById('setupBanner').style.display='none';
+      showSync('تم الربط — قاعدة بيانات جديدة','success');
+      toast('تم الربط بنجاح');
+      cloudLoaded=true;
+      render();
+    }else{
+      const err=await fileR.json();throw new Error(err.message||fileR.status);
+    }
   }catch(e){
     console.error(e);
     toast('خطأ: '+e.message);
@@ -452,7 +465,7 @@ async function loadFromCloud(){
     if(r.status===404){
       // File doesn't exist yet — that's okay
       showSync('تم الاتصال — قاعدة بيانات جديدة','success');isOnline=true;
-      GH_SHA='';return;
+      GH_SHA='';cloudLoaded=true;return;
     }
     if(!r.ok)throw new Error('HTTP '+r.status);
     const file=await r.json();
@@ -464,6 +477,7 @@ async function loadFromCloud(){
       localStorage.setItem(SK,JSON.stringify(d));
       render();showSync('تم المزامنة','success');isOnline=true}
     else showSync('تم الاتصال','success');
+    cloudLoaded=true;
   }catch(e){
     isOnline=false;showSync('وضع عدم الاتصال — البيانات محلية','error');
     console.error('Cloud load failed:',e);
@@ -478,6 +492,8 @@ function persistLocal(){
 
 async function persistCloud(){
   if(!GH_TOKEN)return;
+  // Don't save to cloud until initial cloud load finished — prevents overwriting newer data
+  if(!cloudLoaded){console.warn('Skipped cloud save — initial load not done');return}
   try{
     isSyncing=true;showSync('جاري الحفظ...','');
     // Always get latest SHA before writing to avoid conflicts
@@ -508,7 +524,7 @@ async function persistCloud(){
 }
 
 async function persist(){persistLocal();await persistCloud()}
-async function saveData(){persistLocal();await persistCloud();if(isOnline)toast('<svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg> تم الحفظ والمزامنة')}
+async function saveData(){cloudLoaded=true;persistLocal();await persistCloud();if(isOnline)toast('<svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg> تم الحفظ والمزامنة')}
 async function manualSync(){
   showSync('جاري المزامنة...','');
   await loadFromCloud();
