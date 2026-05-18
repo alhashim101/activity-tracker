@@ -1,0 +1,36 @@
+{
+  "activities": [],
+  "sections": [
+    {
+      "id": "strategic",
+      "name": "المشاريع الاستراتيجية",
+      "colorId": "blue",
+      "icon": "target"
+    },
+    {
+      "id": "digital",
+      "name": "التحول الرقمي",
+      "colorId": "violet",
+      "icon": "cpu"
+    },
+    {
+      "id": "performance",
+      "name": "الأداء المؤسسي",
+      "colorId": "emerald",
+      "icon": "trending"
+    },
+    {
+      "id": "operations",
+      "name": "العمليات التشغيلية",
+      "colorId": "amber",
+      "icon": "settings"
+    },
+    {
+      "id": "general",
+      "name": "مهام عامة",
+      "colorId": "slate",
+      "icon": "inbox"
+    }
+  ],
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٤٨:٥٨ ص"
+}
