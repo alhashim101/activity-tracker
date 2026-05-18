@@ -29,6 +29,21 @@
       "sectionId": "strategic",
       "id": "l7sbv20xv",
       "createdAt": "2026-05-18T04:55:24.783Z"
+    },
+    {
+      "title": "مشروع استراتيجية الاستثمار",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-18",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "3u5unofcl",
+      "createdAt": "2026-05-18T04:55:44.579Z"
     }
   ],
   "sections": [
@@ -63,5 +78,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٥:٢٤ ص"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٥:٤٤ ص"
 }
