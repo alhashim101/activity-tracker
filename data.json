@@ -44,6 +44,21 @@
       "sectionId": "strategic",
       "id": "mi4rdjong",
       "createdAt": "2026-05-18T10:46:06.274Z"
+    },
+    {
+      "title": "تقرير التحول الرقمي",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-19",
+      "priority": "high",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "digital",
+      "id": "25pu75l8p",
+      "createdAt": "2026-05-18T10:46:23.610Z"
     }
   ],
   "sections": [
@@ -78,5 +93,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٦:٠٦ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٦:٢٣ م"
 }
