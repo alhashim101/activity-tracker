@@ -264,7 +264,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary)
   <div class="setup-banner" id="setupBanner" style="display:none">
     <h3>ربط قاعدة البيانات</h3>
     <p>أدخل GitHub Personal Access Token<br>سوّه من <a href="https://github.com/settings/tokens" target="_blank" style="color:#7C3AED;font-weight:700">github.com/settings/tokens</a></p>
-    <input type="password" id="ghTokenInput" placeholder="ghp_XXXXXXXXXXXX..." dir="ltr">
+    <input type="password" id="ghTokenInput" placeholder="ghp_... أو github_pat_..." dir="ltr">
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
       <button class="btn btn-primary" onclick="connectAPI()">ربط</button>
       <button class="btn btn-outline" onclick="skipSetup()">تخطي (حفظ محلي فقط)</button>
@@ -380,7 +380,7 @@ function showSync(msg,type){const b=document.getElementById('syncBar'),d=b.query
 
 async function connectAPI(){
   const token=document.getElementById('ghTokenInput').value.trim();
-  if(!token||!token.startsWith('ghp_')){toast('التوكن غير صحيح — لازم يبدأ بـ ghp_');return}
+  if(!token||(!token.startsWith('ghp_')&&!token.startsWith('github_pat_'))){toast('التوكن غير صحيح');return}
   GH_TOKEN=token;localStorage.setItem('gh_token',token);
   showSync('جاري التحقق...','');
   try{
