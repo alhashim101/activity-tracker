@@ -85,6 +85,21 @@
       "sectionId": "strategic",
       "id": "hz0c759ml",
       "createdAt": "2026-05-18T10:47:20.514Z"
+    },
+    {
+      "title": "مبادرة الاجادة المؤسسية",
+      "description": "",
+      "startDate": "2026-05-20",
+      "deadline": "2026-05-21",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "id": "o8h695v2r",
+      "createdAt": "2026-05-18T10:47:47.786Z"
     }
   ],
   "sections": [
@@ -119,5 +134,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٧:٢٠ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٧:٤٧ م"
 }
