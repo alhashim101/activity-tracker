@@ -59,6 +59,32 @@
       "sectionId": "digital",
       "id": "25pu75l8p",
       "createdAt": "2026-05-18T10:46:23.610Z"
+    },
+    {
+      "title": "جريدة التخطيط",
+      "description": "",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-25",
+      "priority": "medium",
+      "status": "in_progress",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": "36va5f19i",
+          "title": "عكس الملاحظات ",
+          "completed": false
+        },
+        {
+          "id": "5wq3vr2bb",
+          "title": "تغيير ثيمة الجريدة ",
+          "completed": false
+        }
+      ],
+      "sectionId": "strategic",
+      "id": "hz0c759ml",
+      "createdAt": "2026-05-18T10:47:20.514Z"
     }
   ],
   "sections": [
@@ -93,5 +119,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٦:٢٣ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٢:٤٧:٢٠ م"
 }
