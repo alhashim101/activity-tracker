@@ -1,62 +1,5 @@
 {
-  "activities": [
-    {
-      "title": "جريدة التخطيط",
-      "description": "تصميم جريدة التخطيط",
-      "startDate": "2026-05-14",
-      "deadline": "2026-05-18",
-      "priority": "high",
-      "status": "in_progress",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [
-        {
-          "id": "bbq6z08nd",
-          "title": "التأكد من البيانات الموجودة ",
-          "completed": false
-        },
-        {
-          "id": "cqa17n0jx",
-          "title": "عكس الملاحظات من الاء و ريم ",
-          "completed": false
-        }
-      ],
-      "sectionId": "general",
-      "id": "soumi6gua",
-      "createdAt": "2026-05-14T08:07:38.636Z"
-    },
-    {
-      "title": "التقرير الشهري مارس",
-      "description": "مراجعة التقرير",
-      "startDate": "2026-05-17",
-      "deadline": "2026-05-17",
-      "priority": "medium",
-      "status": "in_progress",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "general",
-      "id": "f2lppypzt",
-      "createdAt": "2026-05-14T09:35:53.339Z"
-    },
-    {
-      "title": "الموازنات",
-      "description": "ربط الموازنات معانشطة المشروع",
-      "startDate": "2026-05-19",
-      "deadline": "2026-05-17",
-      "priority": "medium",
-      "status": "pending",
-      "category": "other",
-      "estimatedHours": "",
-      "notes": "",
-      "subtasks": [],
-      "sectionId": "general",
-      "id": "stc6gd5mq",
-      "createdAt": "2026-05-14T09:55:12.947Z"
-    }
-  ],
+  "activities": [],
   "sections": [
     {
       "id": "strategic",
@@ -89,5 +32,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ١٢:١٨:٢٤ م"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ١٢:٢٢:٢١ م"
 }
