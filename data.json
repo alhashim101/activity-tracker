@@ -16,19 +16,19 @@
       "createdAt": "2026-05-18T04:49:10.806Z"
     },
     {
-      "title": "7",
+      "title": "ادخال نتائج اداء الربع الاول",
       "description": "",
-      "startDate": "2026-05-28",
-      "deadline": "2026-05-21",
-      "priority": "medium",
+      "startDate": "2026-05-18",
+      "deadline": "2026-05-19",
+      "priority": "high",
       "status": "in_progress",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
       "subtasks": [],
       "sectionId": "strategic",
-      "id": "xt41ako6p",
-      "createdAt": "2026-05-18T04:50:45.325Z"
+      "id": "l7sbv20xv",
+      "createdAt": "2026-05-18T04:55:24.783Z"
     }
   ],
   "sections": [
@@ -63,5 +63,5 @@
       "icon": "inbox"
     }
   ],
-  "lastSaved": "١٨‏/٥‏/٢٠٢٦، ٨:٥٠:٤٥ ص"
+  "lastSaved": "١٨‏/٥‏/٢٠٢٦ ٨:٥٥:٢٤ ص"
 }
