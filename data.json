@@ -170,6 +170,22 @@
       "project": "",
       "id": "1si4c0r77",
       "createdAt": "2026-05-19T04:19:51.728Z"
+    },
+    {
+      "title": "مشروع خدمات المتعاملين من رابط شارك فكرتك",
+      "description": "",
+      "startDate": "2026-05-20",
+      "deadline": "2026-05-20",
+      "priority": "low",
+      "status": "in_progress",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "39iec5bfy",
+      "createdAt": "2026-05-19T05:48:23.601Z"
     }
   ],
   "sections": [
@@ -222,5 +238,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "١٩‏/٥‏/٢٠٢٦ ٩:٣٦:٢٤ ص"
+  "lastSaved": "١٩‏/٥‏/٢٠٢٦ ٩:٤٨:٢٣ ص"
 }
