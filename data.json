@@ -87,6 +87,22 @@
       "project": "الإسكان الاجتماعي",
       "id": "o03ws4tg4",
       "createdAt": "2026-05-19T03:47:07.087Z"
+    },
+    {
+      "title": "موازنة المشروعات الاستراتيجية",
+      "description": "",
+      "startDate": "2026-05-19",
+      "deadline": "2026-05-19",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "qhwvwkdjk",
+      "createdAt": "2026-05-19T03:47:44.946Z"
     }
   ],
   "sections": [
@@ -139,5 +155,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "١٩‏/٥‏/٢٠٢٦ ٧:٤٧:٠٧ ص"
+  "lastSaved": "١٩‏/٥‏/٢٠٢٦ ٧:٤٧:٤٤ ص"
 }
