@@ -143,6 +143,33 @@
       "sectionId": "strategic",
       "id": "pw0l5n5v7",
       "createdAt": "2026-05-18T10:50:41.034Z"
+    },
+    {
+      "title": "اهداف الموظفين",
+      "description": "",
+      "startDate": "2026-05-19",
+      "deadline": "2026-05-19",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": "wf23ya6ib",
+          "title": "ريم",
+          "completed": false
+        },
+        {
+          "id": "6qk7jifst",
+          "title": "نوف",
+          "completed": false
+        }
+      ],
+      "sectionId": "general",
+      "project": "",
+      "id": "1si4c0r77",
+      "createdAt": "2026-05-19T04:19:51.728Z"
     }
   ],
   "sections": [
@@ -195,5 +222,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "١٩‏/٥‏/٢٠٢٦ ٨:٠٧:٥٣ ص"
+  "lastSaved": "١٩‏/٥‏/٢٠٢٦ ٨:١٩:٥١ ص"
 }
