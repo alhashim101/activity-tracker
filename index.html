@@ -514,9 +514,9 @@ function persistLocal(){
 }
 
 async function persistCloud(){
-  if(!GH_TOKEN)return;
+  if(!GH_TOKEN)return false;
   // Don't save to cloud until initial cloud load finished — prevents overwriting newer data
-  if(!cloudLoaded){console.warn('Skipped cloud save — initial load not done');return}
+  if(!cloudLoaded){console.warn('Skipped cloud save — initial load not done');return false}
   try{
     isSyncing=true;showSync('جاري الحفظ...','');
     // Always get latest SHA before writing to avoid conflicts
@@ -540,13 +540,32 @@ async function persistCloud(){
     const data=await r.json();
     GH_SHA=data.content.sha;
     showSync('تم الحفظ والمزامنة','success');isOnline=true;
+    return true;
   }catch(e){
     isOnline=false;showSync('خطأ في الحفظ: '+e.message,'error');
     console.error('Cloud save failed:',e);
+    return false;
   }finally{isSyncing=false}
 }
 
-async function persist(){persistLocal();await persistCloud()}
+let _saveTimer=null,_saveRetries=0;
+async function persist(){
+  persistLocal();
+  // Debounced cloud save — waits 1 second after last change, then saves
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(async()=>{
+    _saveRetries=0;
+    await persistCloudWithRetry();
+  },1000);
+}
+async function persistCloudWithRetry(){
+  const ok=await persistCloud();
+  if(!ok&&_saveRetries<2){
+    _saveRetries++;
+    console.log('Retrying cloud save, attempt '+(_saveRetries+1));
+    setTimeout(()=>persistCloudWithRetry(),2000);
+  }
+}
 async function saveData(){cloudLoaded=true;persistLocal();await persistCloud();if(isOnline)toast('<svg class="icon icon-sm" viewBox="0 0 24 24" style="stroke:#fff"><polyline points="20 6 9 17 4 12"/></svg> تم الحفظ والمزامنة')}
 async function manualSync(){
   showSync('جاري المزامنة...','');
@@ -827,6 +846,13 @@ function addSection(){
 function delSection(i){sections.splice(i,1);persistLocal();persistCloud();renderSectionMgr()}
 
 load();
+
+// Auto-sync when user comes back to the page (switches tab or unlocks phone)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&GH_TOKEN&&cloudLoaded){
+    loadFromCloud();
+  }
+});
 </script>
 </body>
 </html>
