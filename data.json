@@ -202,6 +202,38 @@
       "project": "",
       "id": "hrnwkgvu6",
       "createdAt": "2026-05-20T09:04:11.794Z"
+    },
+    {
+      "title": "الندوة الفنية",
+      "description": "",
+      "startDate": "2026-05-31",
+      "deadline": "2026-06-04",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": "2padwnfzs",
+          "title": "التنسيق مع التعاون الدولي ",
+          "completed": false
+        },
+        {
+          "id": "490zi3gh4",
+          "title": "ارسال السيناريو الى كوثر ",
+          "completed": false
+        },
+        {
+          "id": "rk2y9dd63",
+          "title": "عرض شركة التصوير و التعاقد معهم ",
+          "completed": false
+        }
+      ],
+      "sectionId": "general",
+      "project": "",
+      "id": "cfrnv8w5q",
+      "createdAt": "2026-05-25T08:51:26.242Z"
     }
   ],
   "sections": [
@@ -254,5 +286,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٥‏/٥‏/٢٠٢٦ ١٢:٤٥:٥٢ م"
+  "lastSaved": "٢٥‏/٥‏/٢٠٢٦ ١٢:٥١:٢٦ م"
 }
