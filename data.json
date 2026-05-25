@@ -68,7 +68,7 @@
       "startDate": "2026-05-18",
       "deadline": "2026-05-25",
       "priority": "medium",
-      "status": "in_progress",
+      "status": "completed",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
@@ -76,7 +76,7 @@
         {
           "id": "36va5f19i",
           "title": "عكس الملاحظات ",
-          "completed": false
+          "completed": true
         },
         {
           "id": "5wq3vr2bb",
@@ -254,5 +254,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٥‏/٥‏/٢٠٢٦ ١١:١٢:٣٦ ص"
+  "lastSaved": "٢٥‏/٥‏/٢٠٢٦، ١٢:٤٢:٥٧ م"
 }
