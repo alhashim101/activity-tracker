@@ -124,7 +124,7 @@
       "startDate": "2026-05-18",
       "deadline": "2026-05-25",
       "priority": "medium",
-      "status": "completed",
+      "status": "in_progress",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
@@ -137,7 +137,7 @@
         {
           "id": "afp54kg1y",
           "title": "الاجتنماع معهم لتوضيح المتطلبات ",
-          "completed": true
+          "completed": false
         }
       ],
       "sectionId": "strategic",
@@ -286,5 +286,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٥‏/٥‏/٢٠٢٦ ١:٢٢:٠٠ م"
+  "lastSaved": "٢٥‏/٥‏/٢٠٢٦ ٢:٤٢:٠١ م"
 }
