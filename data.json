@@ -234,6 +234,22 @@
       "project": "",
       "id": "cfrnv8w5q",
       "createdAt": "2026-05-25T08:51:26.242Z"
+    },
+    {
+      "title": "موازنة مشروع الاجازات المرضية",
+      "description": "",
+      "startDate": "2026-05-31",
+      "deadline": "2026-05-31",
+      "priority": "high",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "pgdp58s9b",
+      "createdAt": "2026-05-31T06:48:51.266Z"
     }
   ],
   "sections": [
@@ -286,5 +302,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٥‏/٥‏/٢٠٢٦ ٢:٤٢:٠١ م"
+  "lastSaved": "٣١‏/٥‏/٢٠٢٦ ١٠:٤٨:٥١ ص"
 }
