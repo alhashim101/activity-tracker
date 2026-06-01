@@ -266,6 +266,22 @@
       "project": "الإسكان الاجتماعي",
       "id": "caa8zxav9",
       "createdAt": "2026-06-01T03:59:06.638Z"
+    },
+    {
+      "title": "متابعة مشروع المحتوى المحلي شهر ٥؟",
+      "description": "",
+      "startDate": "2026-06-01",
+      "deadline": "2026-06-01",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "o41v8urua",
+      "createdAt": "2026-06-01T03:59:50.547Z"
     }
   ],
   "sections": [
@@ -318,5 +334,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "١‏/٦‏/٢٠٢٦، ٧:٥٩:٠٦ ص"
+  "lastSaved": "١‏/٦‏/٢٠٢٦، ٧:٥٩:٥٠ ص"
 }
