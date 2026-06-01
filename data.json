@@ -282,6 +282,33 @@
       "project": "",
       "id": "o41v8urua",
       "createdAt": "2026-06-01T03:59:50.547Z"
+    },
+    {
+      "title": "المذكرات الداخلية",
+      "description": "",
+      "startDate": "2026-06-01",
+      "deadline": "2026-06-03",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [
+        {
+          "id": "zg2c87bp9",
+          "title": "التحول الرقمي ",
+          "completed": false
+        },
+        {
+          "id": "0wcwj31p3",
+          "title": "التسهيلات و الاعفاءات ",
+          "completed": false
+        }
+      ],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "xliptggdy",
+      "createdAt": "2026-06-01T08:41:02.941Z"
     }
   ],
   "sections": [
@@ -334,5 +361,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "١‏/٦‏/٢٠٢٦، ٧:٥٩:٥٠ ص"
+  "lastSaved": "١‏/٦‏/٢٠٢٦ ١٢:٤١:٠٢ م"
 }
