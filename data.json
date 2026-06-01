@@ -250,6 +250,22 @@
       "project": "",
       "id": "pgdp58s9b",
       "createdAt": "2026-05-31T06:48:51.266Z"
+    },
+    {
+      "title": "متابعة شهر ٥",
+      "description": "",
+      "startDate": "2026-06-01",
+      "deadline": "2026-06-01",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "الإسكان الاجتماعي",
+      "id": "caa8zxav9",
+      "createdAt": "2026-06-01T03:59:06.638Z"
     }
   ],
   "sections": [
@@ -302,5 +318,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٣١‏/٥‏/٢٠٢٦ ١:٢٢:١٥ م"
+  "lastSaved": "١‏/٦‏/٢٠٢٦، ٧:٥٩:٠٦ ص"
 }
