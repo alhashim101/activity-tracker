@@ -257,7 +257,7 @@
       "startDate": "2026-06-01",
       "deadline": "2026-06-01",
       "priority": "medium",
-      "status": "pending",
+      "status": "in_progress",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
@@ -361,5 +361,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "١‏/٦‏/٢٠٢٦ ١٢:٤١:٠٢ م"
+  "lastSaved": "٢‏/٦‏/٢٠٢٦ ١٠:٠٦:٥٤ ص"
 }
