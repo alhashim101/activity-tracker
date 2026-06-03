@@ -309,6 +309,22 @@
       "project": "",
       "id": "xliptggdy",
       "createdAt": "2026-06-01T08:41:02.941Z"
+    },
+    {
+      "title": "AI PROJECT 8:30 morning",
+      "description": "",
+      "startDate": "2026-06-03",
+      "deadline": "2026-06-03",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "pxbznqybb",
+      "createdAt": "2026-06-03T12:04:58.556Z"
     }
   ],
   "sections": [
@@ -361,5 +377,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢‏/٦‏/٢٠٢٦ ١٠:٠٦:٥٤ ص"
+  "lastSaved": "٣‏/٦‏/٢٠٢٦، ٤:٠٤:٥٨ م"
 }
