@@ -325,6 +325,22 @@
       "project": "",
       "id": "pxbznqybb",
       "createdAt": "2026-06-03T12:04:58.556Z"
+    },
+    {
+      "title": "تقرير شهر مايو",
+      "description": "",
+      "startDate": "2026-06-07",
+      "deadline": "2026-06-10",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "d1b11bl3i",
+      "createdAt": "2026-06-07T05:25:44.837Z"
     }
   ],
   "sections": [
@@ -377,5 +393,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٤‏/٦‏/٢٠٢٦، ٦:٥٥:٢٧ م"
+  "lastSaved": "٧‏/٦‏/٢٠٢٦ ٩:٢٥:٤٤ ص"
 }
