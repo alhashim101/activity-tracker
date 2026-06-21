@@ -228,7 +228,7 @@
         {
           "id": "490zi3gh4",
           "title": "ارسال السيناريو الى كوثر ",
-          "completed": false
+          "completed": true
         },
         {
           "id": "rk2y9dd63",
@@ -347,6 +347,22 @@
       "project": "",
       "id": "d1b11bl3i",
       "createdAt": "2026-06-07T05:25:44.837Z"
+    },
+    {
+      "title": "الانزال الاستراتيجي لمدراء الدرائر",
+      "description": "",
+      "startDate": "2026-06-21",
+      "deadline": "2026-06-30",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "b0moccis6",
+      "createdAt": "2026-06-21T05:42:05.450Z"
     }
   ],
   "sections": [
@@ -399,5 +415,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢١‏/٦‏/٢٠٢٦، ٩:٤١:١٠ ص"
+  "lastSaved": "٢١‏/٦‏/٢٠٢٦، ٩:٤٢:٠٥ ص"
 }
