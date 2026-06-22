@@ -363,6 +363,22 @@
       "project": "",
       "id": "b0moccis6",
       "createdAt": "2026-06-21T05:42:05.450Z"
+    },
+    {
+      "title": "مراجعة مشروع المحتوى المحلي",
+      "description": "",
+      "startDate": "2026-06-22",
+      "deadline": "2026-06-22",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "xowvj65gk",
+      "createdAt": "2026-06-22T04:48:37.917Z"
     }
   ],
   "sections": [
@@ -415,5 +431,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢١‏/٦‏/٢٠٢٦، ٩:٤٢:٠٥ ص"
+  "lastSaved": "٢٢‏/٦‏/٢٠٢٦ ٨:٤٨:٣٧ ص"
 }
