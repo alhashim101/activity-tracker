@@ -379,6 +379,22 @@
       "project": "",
       "id": "xowvj65gk",
       "createdAt": "2026-06-22T04:48:37.917Z"
+    },
+    {
+      "title": "مشروعات شهر 6",
+      "description": "",
+      "startDate": "2026-06-22",
+      "deadline": "2026-06-22",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "flurkk3hq",
+      "createdAt": "2026-06-22T05:26:25.998Z"
     }
   ],
   "sections": [
@@ -431,5 +447,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٢‏/٦‏/٢٠٢٦ ٨:٤٨:٣٧ ص"
+  "lastSaved": "٢٢‏/٦‏/٢٠٢٦ ٩:٢٦:٢٥ ص"
 }
