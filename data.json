@@ -395,6 +395,22 @@
       "project": "",
       "id": "flurkk3hq",
       "createdAt": "2026-06-22T05:26:25.998Z"
+    },
+    {
+      "title": "jetfoem",
+      "description": "",
+      "startDate": "2026-06-22",
+      "deadline": "2026-06-22",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "w2le8b7du",
+      "createdAt": "2026-06-22T06:34:51.601Z"
     }
   ],
   "sections": [
@@ -447,5 +463,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٢‏/٦‏/٢٠٢٦ ٩:٢٦:٢٥ ص"
+  "lastSaved": "٢٢‏/٦‏/٢٠٢٦ ١٠:٣٤:٥١ ص"
 }
