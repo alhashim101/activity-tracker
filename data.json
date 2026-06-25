@@ -411,6 +411,22 @@
       "project": "",
       "id": "w2le8b7du",
       "createdAt": "2026-06-22T06:34:51.601Z"
+    },
+    {
+      "title": "الموقف التنفيذي للخطة التشغيلية",
+      "description": "",
+      "startDate": "2026-06-25",
+      "deadline": "2026-06-25",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "5xsdm1wyh",
+      "createdAt": "2026-06-25T05:02:20.222Z"
     }
   ],
   "sections": [
@@ -463,5 +479,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٣‏/٦‏/٢٠٢٦ ١١:١٦:٠٥ ص"
+  "lastSaved": "٢٥‏/٦‏/٢٠٢٦ ٩:٠٢:٢٠ ص"
 }
