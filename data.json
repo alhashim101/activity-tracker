@@ -156,7 +156,7 @@
       "startDate": "2026-05-19",
       "deadline": "2026-05-19",
       "priority": "medium",
-      "status": "completed",
+      "status": "in_progress",
       "category": "other",
       "estimatedHours": "",
       "notes": "",
@@ -164,7 +164,7 @@
         {
           "id": "wf23ya6ib",
           "title": "ريم",
-          "completed": true
+          "completed": false
         },
         {
           "id": "6qk7jifst",
@@ -479,5 +479,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٢٥‏/٦‏/٢٠٢٦ ٩:٠٢:٢٠ ص"
+  "lastSaved": "٥‏/٧‏/٢٠٢٦، ١٢:٣٧:٤٩ م"
 }
