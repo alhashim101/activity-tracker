@@ -427,6 +427,22 @@
       "project": "",
       "id": "5xsdm1wyh",
       "createdAt": "2026-06-25T05:02:20.222Z"
+    },
+    {
+      "title": "ssd",
+      "description": "",
+      "startDate": "2026-07-07",
+      "deadline": "2026-07-07",
+      "priority": "medium",
+      "status": "pending",
+      "category": "other",
+      "estimatedHours": "",
+      "notes": "",
+      "subtasks": [],
+      "sectionId": "strategic",
+      "project": "",
+      "id": "8egq76fkc",
+      "createdAt": "2026-07-07T07:24:54.908Z"
     }
   ],
   "sections": [
@@ -479,5 +495,5 @@
     "الهيكل التنظيمي للصندوق",
     "استراتيجية رأس المال البشري"
   ],
-  "lastSaved": "٥‏/٧‏/٢٠٢٦، ١٢:٣٧:٤٩ م"
+  "lastSaved": "٧‏/٧‏/٢٠٢٦ ١١:٢٤:٥٤ ص"
 }
